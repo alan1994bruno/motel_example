@@ -1,4 +1,3 @@
 package com.motel.api.dto;
 
-public class LoginDTO {
-}
+public record LoginDTO(String email, String password) {}

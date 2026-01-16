@@ -1,4 +1,10 @@
 package com.motel.api.dto;
 
-public class UserRegistrationDTO {
-}
+public record UserRegistrationDTO(
+        String email,
+        String password,
+        // Dados opcionais (só obrigatórios se for CLIENT)
+        String cpf,
+        String cep,
+        String phone
+) {}

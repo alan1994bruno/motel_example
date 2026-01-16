@@ -1,4 +1,9 @@
 package com.motel.api.dto;
 
-public class UserUpdateDTO {
-}
+public record UserUpdateDTO(
+        String email,
+        String phone,
+        String cpf,
+        String cep,
+        String password // <--- (Opcional)
+) {}
