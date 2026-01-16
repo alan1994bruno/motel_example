@@ -1,0 +1,1 @@
+ALTER TABLE user_profiles ADD CONSTRAINT uk_user_profile_cpf UNIQUE (cpf);

@@ -1,0 +1,5 @@
+ALTER TABLE reservations
+ADD COLUMN cancelled BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE reservations
+ADD COLUMN cancelled_at TIMESTAMP;

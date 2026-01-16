@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS rooms CASCADE;
+
+CREATE TABLE rooms (
+    id BIGSERIAL PRIMARY KEY,
+    public_id UUID NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    hourly_rate DECIMAL(10, 2) NOT NULL,
+    units INTEGER NOT NULL
+);

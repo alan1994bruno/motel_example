@@ -1,0 +1,2 @@
+ALTER TABLE reservations
+ADD COLUMN penalty_applied BOOLEAN NOT NULL DEFAULT FALSE;
