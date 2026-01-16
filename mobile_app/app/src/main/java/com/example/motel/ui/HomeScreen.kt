@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.motel.model.Suite
@@ -96,7 +97,7 @@ fun LocationSection() {
             Text("LOCALIZAÇÃO", color = BrandPurple, fontSize = 22.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Fácil acesso e discrição total. Venha nos visitar.", color = Color.Gray, fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        Text("Fácil acesso e discrição total. Venha nos visitar.", color = Color.Gray, fontSize = 14.sp, textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.height(16.dp))
         Box(
             modifier = Modifier.fillMaxWidth().height(250.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFFDDDDDD)),
