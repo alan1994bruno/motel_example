@@ -15,17 +15,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.motel.model.Suite
-import com.example.motel.model.mockSuites
+import coil.compose.AsyncImage
+import com.example.motel.viewmodel.HomeViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onLogout: () -> Unit) {
+fun HomeScreen(
+    onLogout: () -> Unit,
+    viewModel: HomeViewModel = viewModel() // Injeta o novo ViewModel
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -36,19 +42,38 @@ fun HomeScreen(onLogout: () -> Unit) {
         },
         containerColor = BackgroundWhite
     ) { innerPadding ->
-        LazyColumn(
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            item {
-                Text("SUÍTES DISPONÍVEIS", color = BrandPurple, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-            }
-            items(mockSuites) { suite -> SuiteCard(suite) }
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-                LocationSection()
-                Spacer(modifier = Modifier.height(16.dp))
+
+        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+
+            if (viewModel.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = BrandPurple)
+            } else if (viewModel.errorMessage != null) {
+                // Botão de tentar novamente se der erro
+                Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Erro ao carregar", color = Color.Red)
+                    Button(onClick = { viewModel.fetchRooms() }) { Text("Tentar Novamente") }
+                }
+            } else {
+                // Lista de Suítes Reais
+                LazyColumn(
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    item {
+                        Text("SUÍTES DISPONÍVEIS", color = BrandPurple, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    }
+
+                    // Usa a lista do ViewModel (viewModel.suites)
+                    items(viewModel.suites) { suite ->
+                        SuiteCard(suite)
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        LocationSection() // Mantenha sua função LocationSection igual estava
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
             }
         }
     }
@@ -63,12 +88,28 @@ fun SuiteCard(suite: Suite) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column {
+            // ÁREA DA IMAGEM
             Box(
-                modifier = Modifier.fillMaxWidth().height(180.dp).background(Color.Gray),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp) // Aumentei um pouco para ficar bonito
+                    .background(Color.LightGray),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Home, null, tint = Color.White, modifier = Modifier.size(64.dp))
+                if (suite.imageUrl != null) {
+                    // Carrega a imagem da URL
+                    AsyncImage(
+                        model = suite.imageUrl,
+                        contentDescription = suite.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop // Corta a imagem para preencher tudo
+                    )
+                } else {
+                    // Placeholder se não tiver imagem na API
+                    Icon(Icons.Default.Home, null, tint = Color.White, modifier = Modifier.size(64.dp))
+                }
             }
+
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text(suite.name, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)

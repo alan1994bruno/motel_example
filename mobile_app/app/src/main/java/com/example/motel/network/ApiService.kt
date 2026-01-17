@@ -7,6 +7,7 @@ import com.example.motel.network.dto.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface ApiService {
@@ -16,6 +17,9 @@ interface ApiService {
 
     @POST("auth/register")
     suspend fun register(@Body request: RegisterRequest): AuthResponse
+
+    @GET("rooms")
+    suspend fun getRooms(): List<RoomDto>
 }
 
 object RetrofitClient {
