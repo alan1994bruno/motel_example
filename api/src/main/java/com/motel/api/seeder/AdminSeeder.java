@@ -5,10 +5,12 @@ import com.motel.api.repository.RoleRepository;
 import com.motel.api.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 @Configuration
+@Profile("!test")
 public class AdminSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;

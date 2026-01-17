@@ -6,6 +6,7 @@ import com.motel.api.model.Room;
 import com.motel.api.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,9 +51,9 @@ public class RoomService {
         return roomRepository.findAll();
     }
 
-    public Room findByName(String name) {
-        return roomRepository.findByNameIgnoreCase(name)
-                .orElseThrow(() -> new RuntimeException("Quarto não encontrado com o nome: " + name));
+    public Room findByUUID(UUID uuid) {
+        return roomRepository.findByPublicId(uuid)
+                .orElseThrow(() -> new RuntimeException("Quarto não encontrado com o uuid: " + uuid));
     }
 
 

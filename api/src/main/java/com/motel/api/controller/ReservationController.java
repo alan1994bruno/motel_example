@@ -11,9 +11,6 @@ import java.util.UUID;
 import org.springframework.security.core.Authentication; // Importante
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.data.domain.Page; // Importante
-import org.springframework.data.domain.Pageable; // Importante
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 
 
 @RestController

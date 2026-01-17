@@ -5,6 +5,7 @@ import com.motel.api.model.Room;
 import com.motel.api.repository.RoomRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Configuration
+@Profile("!test")
 public class RoomSeeder implements CommandLineRunner {
 
     private final RoomRepository roomRepository;

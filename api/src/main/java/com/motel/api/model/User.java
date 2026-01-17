@@ -87,6 +87,8 @@ public class User implements UserDetails {
         return profile;
     }
 
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Converte nosso Enum (ADMIN) para o padrão do Spring (ROLE_ADMIN)

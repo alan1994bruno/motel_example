@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/rooms")
@@ -32,9 +33,9 @@ public class RoomController {
         return ResponseEntity.ok(roomService.listAll());
     }
 
-    // 2. Rota de Busca Específica por Nome (Devolve Objeto Único)
-    @GetMapping("/name/{name}")
-    public ResponseEntity<Room> findByName(@PathVariable String name) {
-        return ResponseEntity.ok(roomService.findByName(name));
+    // 2. Rota de Busca Específica por UUID (Devolve Objeto Único)
+    @GetMapping("/{uuid}")
+    public ResponseEntity<Room> findByName(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(roomService.findByUUID(uuid));
     }
 }
