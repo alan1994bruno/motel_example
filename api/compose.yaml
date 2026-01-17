@@ -1,9 +1,40 @@
 services:
-  postgres:
-    image: 'postgres:latest'
-    environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+  app:
+    build: .
+    container_name: motel_api
     ports:
-      - '5432'
+      - "${APP_PORT}:8080"
+    environment:
+      # Montamos a URL dinamicamente usando as variáveis do .env
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    volumes:
+      - .:/app
+      - ~/.m2:/root/.m2
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    container_name: motel_db # Esse nome deve ser igual ao POSTGRES_HOST no .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    container_name: motel_adminer
+    ports:
+      - "${ADMINER_PORT}:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
