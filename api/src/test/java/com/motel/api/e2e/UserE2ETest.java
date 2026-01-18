@@ -71,10 +71,10 @@ class UserE2ETest {
         // ARRANGE
         UserRegistrationDTO dto = new UserRegistrationDTO(
                 "novo@cliente.com",
-                "senha123",
-                "12345678900", // CPF
+                "Senha123@",
+                "000.000.000-30", // CPF
                 "99999-000",   // CEP
-                "11999999999"  // Phone
+                "(75) 92868-6093"  // Phone
         );
 
         // ACT & ASSERT (Rota geralmente é pública)
@@ -135,13 +135,13 @@ class UserE2ETest {
     @DisplayName("Deve atualizar dados do usuário (PUT /users/{id})")
     void shouldUpdateUser() {
         // ARRANGE
-        User user = createClientInDb("antigo@teste.com", "Antigo");
+        User user = createClientInDb("antigo@teste.com", "060.927-388-49");
         UUID publicId = user.getPublicId();
 
         UserUpdateDTO updateDTO = new UserUpdateDTO(
                 "novo@email.com", // mudando email
                 "11888888888",    // mudando fone
-                "11122233344",    // cpf
+                "060.927.444-90",    // cpf
                 "12345-678",      // cep
                 null              // senha (opcional, null para não mudar)
         );
@@ -157,7 +157,7 @@ class UserE2ETest {
                 .log().all() // <--- ADICIONE ISSO AQUI
                 .statusCode(200)
                 .body("email", equalTo("novo@email.com"))
-                .body("phone", equalTo("11888888888"));
+                .body("profile.phone", equalTo("11888888888"));
     }
 
     // --- Helpers ---
@@ -167,11 +167,18 @@ class UserE2ETest {
         u.setEmail(email);
         u.setPassword(passwordEncoder.encode("123456"));
         u.setRole(clientRole);
-        UserProfile userProfile= new UserProfile();
-        userProfile.setCpf(cpf);
-        userProfile.setCep("44080-071");
-        userProfile.setPhone("(75) 9988686053");
-        u.setProfile(userProfile);
+
+        // --- AQUI ESTAVA FALTANDO O PROFILE ---
+        UserProfile profile = new UserProfile();
+        profile.setCpf(cpf);
+        profile.setPhone("11999999999");
+        profile.setCep("44090-90");
+
+        // O SEGREDO DO JPA (Tem que amarrar dos dois lados)
+        profile.setUser(u); // <--- ESSA LINHA QUE FALTAVA NO SEU TESTE
+        u.setProfile(profile);
+        // ----------------------------------------
+
         return userRepository.save(u);
     }
 

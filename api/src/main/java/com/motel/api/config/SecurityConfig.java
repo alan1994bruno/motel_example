@@ -45,6 +45,8 @@ public class SecurityConfig {
                         .requestMatchers("/reservations/status/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/users/clients").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/users/penalized").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
                         // Dar Check-in na reserva
                         .requestMatchers(HttpMethod.PUT, "/reservations/*/checkin").hasRole("ADMIN")
 

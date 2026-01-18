@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.util.UUID;
 
+import lombok.ToString;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,14 +34,17 @@ public class User implements UserDetails {
 
     @ManyToOne // Vários usuários podem ter o mesmo Role (Admin ou Client)
     @JoinColumn(name = "role_id")
+    @ToString.Exclude
     private Role role;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private UserProfile profile;
 
 
     @OneToOne(mappedBy = "user")
     @JsonIgnoreProperties("user") // <--- EVITA LOOP INFINITO (User -> Penalty -> User)
+    @ToString.Exclude
     private Penalty penalty;
 
     public void setEmail(String email) {

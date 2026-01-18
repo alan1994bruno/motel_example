@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -24,6 +25,7 @@ public class UserProfile {
     @OneToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
+    @ToString.Exclude
     private User user;
 
     public void setCpf(String cpf) {

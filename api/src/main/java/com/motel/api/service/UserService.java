@@ -118,6 +118,7 @@ public class UserService {
     @Transactional
     public User updateUser(UUID publicId, UserUpdateDTO data) {
         User user = findByPublicId(publicId);
+        System.out.println("@@@@@"+user);
 
         if (data.cpf() != null && !data.cpf().equals(user.getProfile().getCpf())) {
             // Se o CPF mudou, verifica se já existe no banco em OUTRA pessoa
@@ -152,7 +153,7 @@ public class UserService {
         if (data.cpf() != null)   user.getProfile().setCpf(data.cpf());
         if (data.cep() != null)   user.getProfile().setCep(data.cep());
 
-        // Removemos o setName() pois você avisou que não existe.
+
 
         return userRepository.save(user);
     }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -27,7 +28,7 @@ public class AuthController {
         System.out.println("Bateu "+data.email()+"  "+data.password());
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
-
+        System.out.println(auth.toString());
         var token = tokenService.generateToken((User) auth.getPrincipal());
 
         return ResponseEntity.ok(Map.of("token", token,"email",data.email()));

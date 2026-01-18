@@ -3,6 +3,7 @@ package com.motel.api.controller;
 import com.motel.api.dto.UserRegistrationDTO;
 import com.motel.api.model.User;
 import com.motel.api.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
@@ -21,7 +22,7 @@ public class UserController  {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody UserRegistrationDTO body) {
+    public ResponseEntity<?> create(@RequestBody @Valid UserRegistrationDTO body) {
         try {
             User createdUser = userService.registerUser(body);
             return ResponseEntity.ok("Usuário criado com ID: " + createdUser.getPublicId());
@@ -59,6 +60,7 @@ public class UserController  {
     public ResponseEntity<User> updateUser(
             @PathVariable UUID publicId,
             @RequestBody UserUpdateDTO data) {
+        System.out.println("Bateu aqui "+publicId);
         return ResponseEntity.ok(userService.updateUser(publicId, data));
     }
 }
