@@ -52,3 +52,14 @@ export async function loginUser(data: LoginFormData): Promise<LoginResponse> {
     msg: ERRO_INESPERADO,
   };
 }
+
+export async function forgotPassword(email: string): Promise<void> {
+  await api.post("/auth/forgot-password", { email });
+}
+
+export async function resetPassword(data: {
+  code: string;
+  newPassword: string;
+}): Promise<void> {
+  await api.post("/auth/reset-password", data);
+}

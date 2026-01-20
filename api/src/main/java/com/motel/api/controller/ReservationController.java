@@ -88,7 +88,18 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.findCancelledReservations(page));
     }
 
-    // GET /reservations/status/completed
+
+    @PutMapping("/{publicId}/complete")
+    // @PreAuthorize("hasRole('ADMIN')") // Descomente se usar Security
+    public ResponseEntity<?> completeReservation(@PathVariable UUID publicId) {
+        try {
+            reservationService.markAsCompleted(publicId);
+            return ResponseEntity.ok("Reserva marcada como COMPLETADA.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/status/completed")
     public ResponseEntity<Page<Reservation>> listCompleted(@RequestParam(defaultValue = "1") int page) {
         return ResponseEntity.ok(reservationService.findCompletedReservations(page));

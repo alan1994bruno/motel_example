@@ -1,6 +1,7 @@
 package com.motel.api.repository;
 
 import com.motel.api.model.Reservation;
+import com.motel.api.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -49,6 +50,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("SELECT r FROM Reservation r WHERE " +
             "(r.cancelled IS NULL OR r.cancelled = false) AND " +
+            "r.completed = false AND " +
             "r.checkoutTime > :now")
     Page<Reservation> findActiveReservations(@Param("now") LocalDateTime now, Pageable pageable);
 
@@ -61,5 +63,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "(r.cancelled IS NULL OR r.cancelled = false) AND " +
             "r.checkoutTime <= :now")
     Page<Reservation> findCompletedReservations(@Param("now") LocalDateTime now, Pageable pageable);
+
+
+    // Busca reservas de um usuário específico que tenham penalidade E não estejam completas
+    List<Reservation> findByUserAndPenaltyAppliedTrueAndCompletedFalse(User user);
+
+    // --- NOVO MÉTODO ---
+    // O Spring Data entende "findBy" + Nome do Campo + "True"
+    Page<Reservation> findByCompletedTrue(Pageable pageable);
 }
 

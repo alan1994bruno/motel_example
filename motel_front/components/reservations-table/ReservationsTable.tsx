@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { checkin } from "@/actions/reservation";
+import { checkin, conclusionReservation } from "@/actions/reservation";
 
 // Interface dos dados que a tabela espera receber
 export interface ReservationData {
@@ -22,6 +22,7 @@ export interface ReservationData {
   price: number;
   checkinTime: string;
   checkoutTime: string;
+  occupied: boolean;
   // Adicione outros campos se necessário (ex: status, data)
 }
 
@@ -31,6 +32,7 @@ interface ReservationsTableProps {
   totalItems: number;
   currentPage: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  getActiveReservations?: () => Promise<void>;
 }
 
 function calculateDurationInHours(start: string, end: string): number {
@@ -52,6 +54,7 @@ export function ReservationsTable({
   totalItems,
   currentPage,
   setCurrentPage,
+  getActiveReservations,
 }: ReservationsTableProps) {
   const itemsPerPage = 10;
 
@@ -69,13 +72,30 @@ export function ReservationsTable({
 
   const currentItems = data.slice(startIndex, endIndex);
 
+  console.log("Current Items for page", currentPage, ":", currentItems);
+
   // --- CÁLCULO DO TOTAL (Apenas da página visível) ---
-  const pageTotal = currentItems.reduce((acc, curr) => acc + curr.price, 0);
+  const pageTotal = currentItems.reduce(
+    (acc, curr) =>
+      acc +
+      curr.price *
+        calculateDurationInHours(curr.checkinTime, curr.checkoutTime),
+    0,
+  );
 
   const handleOccupySuite = async (reservationId: string) => {
-    console.log(`Ocupar suíte com ID: ${reservationId}`);
+    if (!getActiveReservations) return;
     await checkin(reservationId);
+    await getActiveReservations();
   };
+
+  const handleCompletedSuite = async (reservationId: string) => {
+    if (!getActiveReservations) return;
+    await conclusionReservation(reservationId);
+    await getActiveReservations();
+  };
+
+  console.log("ReservationsTable Data:", currentItems);
 
   // Formatador
   const formatMoney = (val: number) =>
@@ -123,13 +143,13 @@ export function ReservationsTable({
                       item.price *
                         calculateDurationInHours(
                           item.checkinTime,
-                          item.checkoutTime
-                        )
+                          item.checkoutTime,
+                        ),
                     )}
                   </TableCell>
 
                   {/* 2. BOTÃO OCUPAR */}
-                  {isOccupied && (
+                  {isOccupied && !item.occupied && (
                     <TableCell className="text-right">
                       <Button
                         size="sm"
@@ -137,6 +157,18 @@ export function ReservationsTable({
                         onClick={handleOccupySuite.bind(null, item.id)}
                       >
                         Ocupar
+                      </Button>
+                    </TableCell>
+                  )}
+                  {/* 2. BOTÃO FINALIZAR */}
+                  {isOccupied && item.occupied && (
+                    <TableCell className="text-right">
+                      <Button
+                        size="sm"
+                        className="bg-[#4c1d95] hover:bg-[#3b1676] text-white font-bold"
+                        onClick={handleCompletedSuite.bind(null, item.id)}
+                      >
+                        Finalizar
                       </Button>
                     </TableCell>
                   )}
@@ -166,8 +198,9 @@ export function ReservationsTable({
               <TableCell className="text-right font-extrabold text-[#4c1d95] text-lg">
                 {formatMoney(pageTotal)}
               </TableCell>
-              {/* Célula vazia para alinhar com a coluna do botão */}
-              <TableCell />
+
+              {/* CORREÇÃO AQUI: Só renderiza a célula vazia se a coluna de Ações existir */}
+              {isOccupied && <TableCell />}
             </TableRow>
           </TableFooter>
         </Table>

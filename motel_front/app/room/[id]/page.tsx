@@ -2,11 +2,10 @@
 import { Header } from "@/components/header/Header";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { getRoomByName } from "@/actions/rooms";
+import { getRoomByPublicId } from "@/actions/rooms";
 import { SuiteDetailCarousel } from "@/components/suite-detail-carousel.tsx/SuiteDetailCarousel";
 import { BookingSection } from "@/components/booking-section/BookingSection";
 import { useUserStore } from "@/store/user-store";
-import { set } from "date-fns";
 import { SuitesSection } from "@/components/suites-section/SuitesSection";
 import { LocationSection } from "@/components/location-section/LocationSection";
 
@@ -19,8 +18,8 @@ export default function RoomPage() {
   const email = useUserStore((state) => state.email);
 
   const fetchRoomData = useCallback(async () => {
-    if (!params.name) return;
-    const data = await getRoomByName(params.name as string);
+    if (!params.id) return;
+    const data = await getRoomByPublicId(params.id as string);
     if (data) {
       setName(data.name);
       setImage(data.images.map((img) => img.url));

@@ -52,6 +52,7 @@ public class RoomService {
     }
 
     public Room findByUUID(UUID uuid) {
+        System.out.println(">>>  "+uuid);
         return roomRepository.findByPublicId(uuid)
                 .orElseThrow(() -> new RuntimeException("Quarto não encontrado com o uuid: " + uuid));
     }

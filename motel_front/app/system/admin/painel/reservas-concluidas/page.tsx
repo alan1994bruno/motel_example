@@ -1,23 +1,39 @@
 "use client";
 
-import * as React from "react";
+import { getReservationCompleted } from "@/actions/reservation";
 import { AdminHeader } from "@/components/header/AdminHeader";
 import {
   ReservationsTable,
   ReservationData,
 } from "@/components/reservations-table/ReservationsTable";
-
-// --- MOCK DE DADOS (Simulando Reservas já finalizadas) ---
-const mockCompletedReservations: ReservationData[] = Array.from({
-  length: 42,
-}).map((_, i) => ({
-  id: `done-${i + 1}`,
-  suiteName: i % 4 === 0 ? "Suíte Erótica Hidro Plus" : "Suíte Self",
-  userEmail: `concluido${i + 1}@email.com`,
-  price: i % 4 === 0 ? 159.9 : 69.9,
-}));
+import { useCallback, useEffect, useState } from "react";
 
 export default function CompletedReservationsPage() {
+  const [totalReservations, setTotalReservations] = useState(0);
+  const [reservations, setReservations] = useState<ReservationData[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const getActiveReservations = useCallback(async () => {
+    const res = await getReservationCompleted();
+    setTotalReservations(res.totalElements);
+    console.log("Active Reservations Data from API:", res.content);
+    setReservations(
+      res.content.map((reservation) => ({
+        id: reservation.publicId,
+        suiteName: reservation.room.name,
+        userEmail: reservation.user.email,
+        price: reservation.room.hourlyRate,
+        checkinTime: reservation.checkinTime,
+        checkoutTime: reservation.checkoutTime,
+        occupied: reservation.occupied,
+      })),
+    );
+  }, []);
+
+  useEffect(() => {
+    getActiveReservations();
+  }, [getActiveReservations]);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <AdminHeader />
@@ -38,13 +54,18 @@ export default function CompletedReservationsPage() {
           <div className="text-sm font-medium text-gray-600 bg-white px-4 py-2 rounded-md shadow-sm border">
             Total Concluído:{" "}
             <span className="font-bold text-green-600">
-              {mockCompletedReservations.length}
+              {totalReservations}
             </span>
           </div>
         </div>
 
         {/* Reutilizando a mesma Tabela */}
-        <ReservationsTable data={mockCompletedReservations} />
+        <ReservationsTable
+          data={reservations}
+          totalItems={totalReservations}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       </main>
     </div>
   );

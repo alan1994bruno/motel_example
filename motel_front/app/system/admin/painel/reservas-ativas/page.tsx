@@ -8,8 +8,6 @@ import {
 } from "@/components/reservations-table/ReservationsTable";
 import { getReservationActive } from "@/actions/reservation";
 
-// --- MOCK DE DADOS (Simulação) ---
-
 export default function ActiveReservationsPage() {
   const [totalReservations, setTotalReservations] = useState(0);
   const [reservations, setReservations] = useState<ReservationData[]>([]);
@@ -18,6 +16,7 @@ export default function ActiveReservationsPage() {
   const getActiveReservations = useCallback(async () => {
     const res = await getReservationActive();
     setTotalReservations(res.totalElements);
+    console.log("Active Reservations Data from API:", res.content);
     setReservations(
       res.content.map((reservation) => ({
         id: reservation.publicId,
@@ -26,7 +25,8 @@ export default function ActiveReservationsPage() {
         price: reservation.room.hourlyRate,
         checkinTime: reservation.checkinTime,
         checkoutTime: reservation.checkoutTime,
-      }))
+        occupied: reservation.occupied,
+      })),
     );
   }, []);
 
@@ -59,6 +59,7 @@ export default function ActiveReservationsPage() {
         <ReservationsTable
           currentPage={currentPage}
           totalItems={totalReservations}
+          getActiveReservations={getActiveReservations}
           setCurrentPage={setCurrentPage}
           isOccupied={true}
           data={reservations}

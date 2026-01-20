@@ -34,6 +34,12 @@ export async function cancelReservation(publicId: string): Promise<void> {
   } catch {}
 }
 
+export async function conclusionReservation(publicId: string): Promise<void> {
+  try {
+    await api.put<RoomResponse>("/reservations/" + publicId + "/complete");
+  } catch {}
+}
+
 export async function getReservationActive(): Promise<ReservationApiResponse> {
   const res = await api.get(`/reservations/status/active`);
   return res.data;

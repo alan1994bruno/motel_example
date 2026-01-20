@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
@@ -119,24 +118,6 @@ export default function EditClientPage() {
     // Aqui você faria: await getClientById(clientId)
     console.log("Buscando dados do ID:", clientId);
     if (clientId) getClientById(clientId as string);
-
-    // Simulando delay da API
-    /*setTimeout(() => {
-      // Dados que viriam do Backend
-      const mockData = {
-        email: "cliente.exemplo@gmail.com",
-        cpf: "123.456.789-00",
-        phone: "(75) 99988-7766",
-        cep: "44000-000",
-      };
-
-      // Preenche o formulário
-      form.reset({
-        ...mockData,
-        password: "", // Senha vem vazia para não sobrescrever
-      });
-      setLoading(false);
-    }, 1000); */
   }, [clientId, form]);
 
   // --- 4. SUBMISSÃO ---
@@ -147,15 +128,13 @@ export default function EditClientPage() {
       cpf: data.cpf,
       phone: data.phone,
       cep: data.cep,
-      // Só envia a senha se o usuário digitou algo
       ...(data.password ? { password: data.password } : {}),
     };
 
     console.log("Enviando atualização:", payload);
 
-    // await updateClient(payload)
+    await updateUserClient(clientId as string, payload);
     alert("Cliente atualizado com sucesso!");
-    updateUserClient(clientId as string, payload);
     router.push("/system/admin/painel/clientes");
   };
 

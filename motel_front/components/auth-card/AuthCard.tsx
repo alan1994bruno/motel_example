@@ -26,7 +26,8 @@ import { createUser } from "@/actions/user";
 import { loginUser } from "@/actions/login-user";
 import { useUserStore } from "@/store/user-store";
 import { useRouter } from "next/navigation";
-
+import { Separator } from "@radix-ui/react-separator";
+import Link from "next/link";
 // --- SCHEMAS DE VALIDAÇÃO (YUP) ---
 
 const loginSchema = yup.object({
@@ -48,6 +49,7 @@ const registerSchema = yup.object({
     .string()
     .matches(/^\d{11}$|^\d{3}\.\d{3}\.\d{3}\-\d{2}$/, "CPF inválido") // Aceita com ou sem pontuação
     .required("CPF é obrigatório"),
+  cep: yup.string().required("CEP é obrigatório"),
   phone: yup.string().required("Telefone é obrigatório"),
 });
 
@@ -114,6 +116,13 @@ function LoginForm() {
         >
           Login
         </Button>
+        <Separator className="my-4" />
+        <Link
+          href="/recuperar-senha"
+          className="text-sm text-center text-gray-600 hover:underline w-full block"
+        >
+          Esqueci minha senha
+        </Link>
       </form>
     </Form>
   );
@@ -194,6 +203,19 @@ function RegisterForm() {
               <FormLabel>CPF</FormLabel>
               <FormControl>
                 <Input placeholder="Insira seu CPF" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="cep"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>CPF</FormLabel>
+              <FormControl>
+                <Input placeholder="Insira seu CEP" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

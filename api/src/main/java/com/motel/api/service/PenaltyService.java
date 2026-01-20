@@ -14,10 +14,12 @@ public class PenaltyService {
 
     private final PenaltyRepository penaltyRepository;
     private final UserRepository userRepository; // Nova injeção
+    private final ReservationService reservationService;
 
-    public PenaltyService(PenaltyRepository penaltyRepository, UserRepository userRepository) {
+    public PenaltyService(PenaltyRepository penaltyRepository, UserRepository userRepository,ReservationService reservationService) {
         this.penaltyRepository = penaltyRepository;
         this.userRepository = userRepository;
+        this.reservationService = reservationService;
     }
     // Método para o Admin ver quem está devendo
     public List<Penalty> listAll() {
@@ -43,6 +45,8 @@ public class PenaltyService {
 
         // 3. Agora deleta sem conflito
         penaltyRepository.delete(penalty);
+
+        reservationService.resolvePenaltiesForUser(user);
     }
 
     // --- NOVO MÉTODO: Consultar minha dívida ---

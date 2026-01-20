@@ -9,6 +9,7 @@ interface Suites {
   name: string;
   price: string;
   image: string;
+  publicId: string;
 }
 
 export function SuitesSection() {
@@ -21,10 +22,11 @@ export function SuitesSection() {
 
     setSuites(
       data.map((room) => ({
+        publicId: room.publicId,
         name: room.name,
         price: room.hourlyRate.toFixed(2),
         image: room.images[0]?.url,
-      }))
+      })),
     );
   }, []);
 
@@ -93,7 +95,7 @@ export function SuitesSection() {
 
                 <Button
                   className="bg-[#e11d48] hover:bg-[#be123c] text-white font-bold uppercase rounded-sm px-8 py-6 text-sm tracking-wider shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5"
-                  onClick={() => navigateRoom(suite.name)}
+                  onClick={() => navigateRoom(suite.publicId)}
                 >
                   Ver Suíte
                 </Button>

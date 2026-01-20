@@ -45,6 +45,9 @@ public class Reservation {
     @Column(nullable = false)
     private Boolean cancelled = false;
 
+    @Column(nullable = false)
+    private Boolean completed = false;
+
     private LocalDateTime cancelledAt;
 
     public LocalDateTime getCheckinTime() {
@@ -121,4 +124,14 @@ public class Reservation {
     public BigDecimal getPrice() {
         return price;
     }
+
+    public Boolean getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
+    }
+
+
 }

@@ -49,6 +49,7 @@ class ReservationE2ETest {
 
     private Room savedRoom;
     private String clientToken;
+    private String adminToken;
 
     @BeforeEach
     void setUp() {
@@ -88,14 +89,27 @@ class ReservationE2ETest {
         clientRole.setLevel(Role.Level.CLIENT);
         roleRepository.save(clientRole);
 
+        // 3. Criar Role e Admin
+        Role clientRoleAdmin = new Role();
+        clientRoleAdmin.setLevel(Role.Level.ADMIN);
+        roleRepository.save(clientRoleAdmin);
+
+
         User client = new User();
         client.setEmail("cliente@motel.com");
         client.setPassword(passwordEncoder.encode("123456"));
         client.setRole(clientRole);
         userRepository.save(client);
 
+        User clientAdmin = new User();
+        clientAdmin.setEmail("admin@admin.com");
+        clientAdmin.setPassword(passwordEncoder.encode("123456"));
+        clientAdmin.setRole(clientRoleAdmin);
+        userRepository.save(clientAdmin);
+
         // 3. Logar e guardar o token
         clientToken = loginAndGetToken("cliente@motel.com", "123456");
+        adminToken = loginAndGetToken("admin@admin.com", "123456");
     }
 
     @Test
@@ -153,6 +167,50 @@ class ReservationE2ETest {
                 .then()
                 .statusCode(200)
                 .body("publicId", equalTo(reservation.getPublicId().toString()));
+    }
+
+
+    @Test
+    @DisplayName("Deve listar apenas reservas completadas")
+    void shouldListOnlyCompletedReservations() {
+        // ARRANGE - Limpar banco e criar cenários
+        reservationRepository.deleteAll();
+
+        // 2. BUSCAR O USUÁRIO (Correção aqui)
+        // Recuperamos o usuário que o setUp() criou pelo email
+        User clientUser = userRepository.findByEmail("cliente@motel.com")
+                .orElseThrow(() -> new RuntimeException("Usuário de teste não encontrado"));
+
+        // Cria uma reserva COMPLETA (true)
+        Reservation r1 = new Reservation();
+        r1.setUser(clientUser); // clientUser criado no setUp
+        r1.setRoom(savedRoom);
+        r1.setCheckinTime(LocalDateTime.now().plusDays(1));
+        r1.setCheckoutTime(LocalDateTime.now().plusDays(2));
+        r1.setPrice(BigDecimal.TEN);
+        r1.setCompleted(true); // <--- O QUE IMPORTA
+        reservationRepository.save(r1);
+
+        // Cria uma reserva PENDENTE (false)
+        Reservation r2 = new Reservation();
+        r2.setUser(clientUser);
+        r2.setRoom(savedRoom);
+        r2.setCheckinTime(LocalDateTime.now().plusDays(3));
+        r2.setCheckoutTime(LocalDateTime.now().plusDays(4));
+        r2.setPrice(BigDecimal.TEN);
+        r2.setCompleted(false); // <--- NÃO DEVE VIR NA LISTA
+        reservationRepository.save(r2);
+
+        // ACT & ASSERT
+        given()
+                .header("Authorization", "Bearer " + adminToken) // Use token de Admin
+                .queryParam("page", 1)
+                .when()
+                .get("/reservations/status/completed")
+                .then()
+                .statusCode(200)
+                .body("content", hasSize(1)) // Só deve vir 1 (a r1)
+                .body("content[0].completed", is(true));
     }
 
     @Test

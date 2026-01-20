@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page; // Importante
 import org.springframework.data.domain.Pageable; // Importante
@@ -221,17 +222,51 @@ public class ReservationService {
         return reservationRepository.findCancelledReservations(pageable);
     }
 
-    // Listar CONCLUÍDAS (Passado)
-    public Page<Reservation> findCompletedReservations(int pageNumber) {
-        Pageable pageable = createPageable(pageNumber);
-        return reservationRepository.findCompletedReservations(LocalDateTime.now(), pageable);
-    }
+
 
     // Método auxiliar para não repetir código de paginação
     private Pageable createPageable(int pageNumber) {
         if (pageNumber < 1) pageNumber = 1;
         // Ordena por checkin_time decrescente (as mais novas primeiro)
         return PageRequest.of(pageNumber - 1, 10, Sort.by("checkinTime").descending());
+    }
+
+
+    @Transactional
+    public void markAsCompleted(UUID publicId) {
+        Reservation reservation = reservationRepository.findByPublicId(publicId)
+                .orElseThrow(() -> new RuntimeException("Reserva não encontrada."));
+
+        if (reservation.getCompleted()) {
+            throw new IllegalArgumentException("Esta reserva já foi completada anteriormente.");
+        }
+
+        reservation.setCompleted(true);
+        reservationRepository.save(reservation);
+    }
+
+    // CASO 2: Sistema baixa todas as reservas penalizadas quando o usuário paga
+    @Transactional
+    public void resolvePenaltiesForUser(User user) {
+        // 1. Busca todas as reservas desse usuário que geraram multa e estão em aberto
+        List<Reservation> penalizedReservations =
+                reservationRepository.findByUserAndPenaltyAppliedTrueAndCompletedFalse(user);
+
+        // 2. Marca todas como completed
+        for (Reservation res : penalizedReservations) {
+            res.setCompleted(true);
+        }
+
+        // 3. Salva todas de uma vez
+        reservationRepository.saveAll(penalizedReservations);
+    }
+
+    public Page<Reservation> findCompletedReservations(int page) {
+        // Ajuste o tamanho da página (ex: 10 itens) e ordenação (ex: mais recentes primeiro)
+        // Lembre-se: page - 1 porque o usuário envia 1, mas o Spring conta do 0
+        Pageable pageable = PageRequest.of(page - 1, 10, Sort.by("checkinTime").descending());
+
+        return reservationRepository.findByCompletedTrue(pageable);
     }
 
 

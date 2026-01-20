@@ -17,9 +17,11 @@ export async function getRooms(): Promise<RoomTypeList> {
   }
 }
 
-export async function getRoomByName(name: string): Promise<RoomType | null> {
+export async function getRoomByPublicId(
+  publicId: string,
+): Promise<RoomType | null> {
   try {
-    const res = await api.get<String>(`/rooms/name/${name}`);
+    const res = await api.get<String>(`/rooms/${publicId}`);
 
     return res.data;
   } catch {
