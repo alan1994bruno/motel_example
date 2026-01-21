@@ -1,60 +1,49 @@
 "use server";
+
 import { api } from "@/lib/api";
 import {
   ReservationApiResponse,
   ReservationSummary,
+  ReservationRequest,
 } from "@/types/reresvation.type";
-import { RoomResponse, RoomType, RoomTypeList } from "@/types/rooms.type";
-
-export type ReservationRequest = {
-  roomPublicId: string; // uuid
-  checkinTime: string; // ISO 8601 datetime
-  checkoutTime: string; // ISO 8601 datetime
-};
+import { RoomResponse } from "@/types/rooms.type";
 
 export async function saveReservation(data: ReservationRequest): Promise<void> {
-  try {
-    await api.post<RoomResponse>("/reservations", data);
-  } catch {}
+  await api.post<RoomResponse>("/reservations", data);
 }
 
-export async function getMyReservation(): Promise<ReservationSummary | null> {
-  try {
-    const res = await api.get<String>(`/reservations/my-reservation`);
-
-    return res.data;
-  } catch {
-    return null;
-  }
+export async function getMyReservation(): Promise<ReservationSummary> {
+  const res = await api.get("/reservations/my-reservation");
+  return res.data;
 }
 
 export async function cancelReservation(publicId: string): Promise<void> {
-  try {
-    await api.delete<RoomResponse>("/reservations/" + publicId);
-  } catch {}
+  await api.delete(`/reservations/${publicId}`);
 }
 
 export async function conclusionReservation(publicId: string): Promise<void> {
-  try {
-    await api.put<RoomResponse>("/reservations/" + publicId + "/complete");
-  } catch {}
-}
-
-export async function getReservationActive(): Promise<ReservationApiResponse> {
-  const res = await api.get(`/reservations/status/active`);
-  return res.data;
-}
-
-export async function getReservationCancelled(): Promise<ReservationApiResponse> {
-  const res = await api.get(`/reservations/status/cancelled`);
-  return res.data;
-}
-
-export async function getReservationCompleted(): Promise<ReservationApiResponse> {
-  const res = await api.get(`/reservations/status/completed`);
-  return res.data;
+  await api.put<RoomResponse>(`/reservations/${publicId}/complete`);
 }
 
 export async function checkin(publicId: string): Promise<void> {
   await api.put<RoomResponse>(`/reservations/${publicId}/checkin`);
+}
+
+async function getReservationsByStatus(
+  status: string,
+): Promise<ReservationApiResponse> {
+  const res = await api.get(`/reservations/status/${status}`);
+  return res.data;
+}
+
+export async function getReservationActive(): Promise<ReservationApiResponse> {
+  return getReservationsByStatus("active");
+}
+
+export async function getReservationCancelled(): Promise<ReservationApiResponse> {
+  return getReservationsByStatus("cancelled");
+}
+
+export async function getReservationCompleted(): Promise<ReservationApiResponse> {
+  return getReservationsByStatus("completed");
 }

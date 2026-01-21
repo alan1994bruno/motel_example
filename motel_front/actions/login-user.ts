@@ -1,8 +1,6 @@
 "use server";
 
-import { ERRO_INESPERADO } from "@/common/constants";
 import { api } from "@/lib/api";
-import axios from "axios";
 import { cookies } from "next/headers";
 
 type LoginFormData = {
