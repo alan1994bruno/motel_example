@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronLeft, ChevronRight } from "lucide-react"; // 1. Icons
 import {
   Table,
   TableBody,
@@ -8,11 +9,11 @@ import {
   TableHeader,
   TableRow,
   TableFooter,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { checkin, conclusionReservation } from "@/actions/reservation";
-import type { ReservationsTableProps } from "@/components/reservations-table";
+} from "@/components/ui/table"; // 2. Table
+import { Button } from "@/components/ui/button"; // 3. Button
+import { checkin, conclusionReservation } from "@/actions/reservation"; // 4. Actions
+import type { ReservationsTableProps } from "./reservations-table.types"; // 6. Local
+import { useCallback } from "react";
 
 function calculateDurationInHours(start: string, end: string): number {
   const startDate = new Date(start);
@@ -49,8 +50,6 @@ export function ReservationsTable({
 
   const currentItems = data.slice(startIndex, endIndex);
 
-  console.log("Current Items for page", currentPage, ":", currentItems);
-
   // --- CÁLCULO DO TOTAL (Apenas da página visível) ---
   const pageTotal = currentItems.reduce(
     (acc, curr) =>
@@ -60,19 +59,23 @@ export function ReservationsTable({
     0,
   );
 
-  const handleOccupySuite = async (reservationId: string) => {
-    if (!getActiveReservations) return;
-    await checkin(reservationId);
-    await getActiveReservations();
-  };
+  const handleOccupySuite = useCallback(
+    async (reservationId: string) => {
+      if (!getActiveReservations) return;
+      await checkin(reservationId);
+      await getActiveReservations();
+    },
+    [getActiveReservations],
+  );
 
-  const handleCompletedSuite = async (reservationId: string) => {
-    if (!getActiveReservations) return;
-    await conclusionReservation(reservationId);
-    await getActiveReservations();
-  };
-
-  console.log("ReservationsTable Data:", currentItems);
+  const handleCompletedSuite = useCallback(
+    async (reservationId: string) => {
+      if (!getActiveReservations) return;
+      await conclusionReservation(reservationId);
+      await getActiveReservations();
+    },
+    [getActiveReservations],
+  );
 
   // Formatador
   const formatMoney = (val: number) =>
@@ -131,7 +134,7 @@ export function ReservationsTable({
                       <Button
                         size="sm"
                         className="bg-[#4c1d95] hover:bg-[#3b1676] text-white font-bold"
-                        onClick={handleOccupySuite.bind(null, item.id)}
+                        onClick={() => handleOccupySuite(item.id)}
                       >
                         Ocupar
                       </Button>
@@ -143,7 +146,7 @@ export function ReservationsTable({
                       <Button
                         size="sm"
                         className="bg-[#4c1d95] hover:bg-[#3b1676] text-white font-bold"
-                        onClick={handleCompletedSuite.bind(null, item.id)}
+                        onClick={() => handleCompletedSuite(item.id)}
                       >
                         Finalizar
                       </Button>
