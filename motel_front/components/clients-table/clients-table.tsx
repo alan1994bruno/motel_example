@@ -44,10 +44,10 @@ export function ClientsTable({
               <TableHead className="font-bold text-[#4c1d95]">
                 Email do Cliente
               </TableHead>
-              <TableHead className="w-[200px] font-bold text-[#4c1d95] text-center">
+              <TableHead className="w-50 font-bold text-[#4c1d95] text-center">
                 Penalizado?
               </TableHead>
-              <TableHead className="w-[100px] text-right font-bold text-[#4c1d95]">
+              <TableHead className="w-25 text-right font-bold text-[#4c1d95]">
                 Ações
               </TableHead>
             </TableRow>

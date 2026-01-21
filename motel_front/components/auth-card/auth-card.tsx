@@ -229,7 +229,7 @@ function RegisterForm() {
 export function AuthCard() {
   return (
     <div className="flex items-center justify-center py-12">
-      <Tabs defaultValue="login" className="w-[400px]">
+      <Tabs defaultValue="login" className="w-100">
         <TabsList className="grid w-full grid-cols-2 mb-4 bg-gray-100">
           <TabsTrigger
             value="login"

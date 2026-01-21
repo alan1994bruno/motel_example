@@ -91,7 +91,7 @@ export function ReservationsTable({
         <Table>
           <TableHeader className="bg-gray-100">
             <TableRow>
-              <TableHead className="w-[300px] font-bold text-[#4c1d95]">
+              <TableHead className="w-75 font-bold text-[#4c1d95]">
                 Suíte
               </TableHead>
               <TableHead className="font-bold text-[#4c1d95]">
