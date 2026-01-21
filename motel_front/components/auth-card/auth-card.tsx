@@ -2,7 +2,14 @@
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import {
+  loginSchema,
+  registerSchema,
+} from "@/components/auth-card/auth-card.schemas";
+import type {
+  LoginFormData,
+  RegisterFormData,
+} from "@/components/auth-card/auth-card.schemas";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -28,52 +35,25 @@ import { useUserStore } from "@/store/user-store";
 import { useRouter } from "next/navigation";
 import { Separator } from "@radix-ui/react-separator";
 import Link from "next/link";
-// --- SCHEMAS DE VALIDAÇÃO (YUP) ---
-
-const loginSchema = yup.object({
-  email: yup.string().email("Email inválido").required("O email é obrigatório"),
-  password: yup.string().required("A senha é obrigatória"),
-});
-
-const registerSchema = yup.object({
-  email: yup.string().email("Email inválido").required("O email é obrigatório"),
-  password: yup
-    .string()
-    .min(6, "A senha deve ter no mínimo 6 caracteres")
-    .required("A senha é obrigatória"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password")], "As senhas não coincidem")
-    .required("Confirme sua senha"),
-  cpf: yup
-    .string()
-    .matches(/^\d{11}$|^\d{3}\.\d{3}\.\d{3}\-\d{2}$/, "CPF inválido") // Aceita com ou sem pontuação
-    .required("CPF é obrigatório"),
-  cep: yup.string().required("CEP é obrigatório"),
-  phone: yup.string().required("Telefone é obrigatório"),
-});
-
-type LoginFormData = yup.InferType<typeof loginSchema>;
-type RegisterFormData = yup.InferType<typeof registerSchema>;
-
-// --- COMPONENTES DOS FORMULÁRIOS ---
 
 function LoginForm() {
-  const form = useForm({
+  const form = useForm<LoginFormData>({
     resolver: yupResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
+  const setEmail = useUserStore((state) => state.setEmail);
 
   const router = useRouter();
 
   const onSubmit = async (data: LoginFormData) => {
-    console.log("Login Data:", data);
-    const result = await loginUser(data);
-
-    console.log("Login Result:", result);
-    if (result.success && result.data) {
-      useUserStore.getState().setEmail(result.data); // salva no store
-      router.replace("/"); // redireciona para a página inicial
+    try {
+      const { email } = await loginUser(data);
+      if (email) {
+        setEmail(email);
+        router.replace("/");
+      }
+    } catch (error) {
+      form.setError("root", { message: "Erro no login" });
     }
   };
 
@@ -129,7 +109,7 @@ function LoginForm() {
 }
 
 function RegisterForm() {
-  const form = useForm({
+  const form = useForm<RegisterFormData>({
     resolver: yupResolver(registerSchema),
     defaultValues: {
       email: "",
@@ -141,8 +121,7 @@ function RegisterForm() {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    console.log("Register Data:", data);
-    console.log(await createUser(data));
+    await createUser(data);
   };
 
   return (
@@ -213,7 +192,7 @@ function RegisterForm() {
           name="cep"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>CPF</FormLabel>
+              <FormLabel>CEP</FormLabel>
               <FormControl>
                 <Input placeholder="Insira seu CEP" {...field} />
               </FormControl>

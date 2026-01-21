@@ -1,15 +1,13 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { LogOut, Menu } from "lucide-react";
-import { clearCookie } from "@/lib/clear-cookie";
-import { useUserStore } from "@/store/user-store";
-import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
 
+// 1. Libs
+import { cn } from "@/lib/utils";
+import { clearCookie } from "@/lib/clear-cookie";
+
+// 2. UI Components (shadcn)
+import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -19,7 +17,6 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-
 import {
   Sheet,
   SheetContent,
@@ -35,6 +32,17 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+// 3. Icons
+import { LogOut, Menu } from "lucide-react";
+
+// 4. Hooks
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useUserStore } from "@/store/user-store";
+
+// 5. Next.js
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 export function AdminHeader() {
   const router = useRouter();
   const clear = useUserStore((state) => state.clear);
@@ -46,15 +54,17 @@ export function AdminHeader() {
     router.replace("/system/admin");
   };
 
-  const baseLinkStyle =
-    "bg-transparent text-xs font-bold text-[#4c1d95] uppercase hover:text-[#7c3aed] hover:bg-purple-50 data-[active]:bg-purple-50 data-[state=open]:bg-purple-50 transition-colors";
+  const NAV_TRIGGER_BASE =
+    "text-xs font-bold uppercase text-primary hover:text-primary-hover hover:bg-purple-50 transition-colors";
+  const NAV_ACTIVE =
+    "data-[active]:bg-purple-50 data-[state=open]:bg-purple-50";
+  const MOBILE_MAIN_LINK =
+    "text-sm font-bold uppercase text-primary hover:text-primary-hover";
+  const MOBILE_SUB_LINK = "text-sm text-gray-600 hover:text-primary";
 
   const Logo = () => (
     <div className="relative group cursor-pointer w-fit">
-      <h1
-        className="text-4xl font-extrabold text-[#4c1d95] -rotate-6 tracking-tighter italic"
-        style={{ fontFamily: "sans-serif" }}
-      >
+      <h1 className="text-4xl font-extrabold text-[#4c1d95] -rotate-6 tracking-tighter italic font-sans">
         Motel
       </h1>
       <div className="h-1 w-full bg-[#4c1d95] mt-1 rounded-full"></div>
@@ -80,7 +90,11 @@ export function AdminHeader() {
                 <NavigationMenuLink asChild>
                   <Link
                     href="/system/admin/painel"
-                    className={cn(navigationMenuTriggerStyle(), baseLinkStyle)}
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      NAV_TRIGGER_BASE,
+                      NAV_ACTIVE,
+                    )}
                   >
                     Início
                   </Link>
@@ -88,7 +102,9 @@ export function AdminHeader() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={cn(baseLinkStyle)}>
+                <NavigationMenuTrigger
+                  className={cn(NAV_TRIGGER_BASE, NAV_ACTIVE)}
+                >
                   Reservas
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -119,7 +135,11 @@ export function AdminHeader() {
                 <NavigationMenuLink asChild>
                   <Link
                     href="/system/admin/painel/suites"
-                    className={cn(navigationMenuTriggerStyle(), baseLinkStyle)}
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      NAV_TRIGGER_BASE,
+                      NAV_ACTIVE,
+                    )}
                   >
                     Suítes
                   </Link>
@@ -130,7 +150,11 @@ export function AdminHeader() {
                 <NavigationMenuLink asChild>
                   <Link
                     href="/system/admin/painel/clientes"
-                    className={cn(navigationMenuTriggerStyle(), baseLinkStyle)}
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      NAV_TRIGGER_BASE,
+                      NAV_ACTIVE,
+                    )}
                   >
                     Clientes
                   </Link>
@@ -141,7 +165,11 @@ export function AdminHeader() {
                 <NavigationMenuLink asChild>
                   <Link
                     href="/system/admin/painel/clientes-penalizados"
-                    className={cn(navigationMenuTriggerStyle(), baseLinkStyle)}
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      NAV_TRIGGER_BASE,
+                      NAV_ACTIVE,
+                    )}
                   >
                     Clientes Penalizados
                   </Link>
@@ -171,7 +199,7 @@ export function AdminHeader() {
                 <SheetClose asChild>
                   <Link
                     href="/system/admin/painel"
-                    className="text-sm font-bold text-[#4c1d95] uppercase hover:text-[#7c3aed]"
+                    className={MOBILE_MAIN_LINK}
                   >
                     Início
                   </Link>
@@ -183,14 +211,19 @@ export function AdminHeader() {
                   className="w-full border-none"
                 >
                   <AccordionItem value="reservas" className="border-b-0">
-                    <AccordionTrigger className="py-0 text-sm font-bold text-[#4c1d95] uppercase hover:text-[#7c3aed] hover:no-underline">
+                    <AccordionTrigger
+                      className={cn(
+                        "py-0 hover:no-underline",
+                        MOBILE_MAIN_LINK,
+                      )}
+                    >
                       Reservas
                     </AccordionTrigger>
                     <AccordionContent className="flex flex-col gap-3 pt-3 pl-4">
                       <SheetClose asChild>
                         <Link
                           href="/system/admin/painel/reservas-ativas"
-                          className="text-sm text-gray-600 hover:text-[#4c1d95]"
+                          className={MOBILE_SUB_LINK}
                         >
                           • Ativas
                         </Link>
@@ -198,7 +231,7 @@ export function AdminHeader() {
                       <SheetClose asChild>
                         <Link
                           href="/system/admin/painel/reservas-canceladas"
-                          className="text-sm text-gray-600 hover:text-[#4c1d95]"
+                          className={MOBILE_SUB_LINK}
                         >
                           • Canceladas
                         </Link>
@@ -206,7 +239,7 @@ export function AdminHeader() {
                       <SheetClose asChild>
                         <Link
                           href="/system/admin/painel/reservas-concluidas"
-                          className="text-sm text-gray-600 hover:text-[#4c1d95]"
+                          className={MOBILE_SUB_LINK}
                         >
                           • Concluídas
                         </Link>
@@ -218,7 +251,7 @@ export function AdminHeader() {
                 <SheetClose asChild>
                   <Link
                     href="/system/admin/painel/suites"
-                    className="text-sm font-bold text-[#4c1d95] uppercase hover:text-[#7c3aed]"
+                    className={MOBILE_MAIN_LINK}
                   >
                     Suítes
                   </Link>
@@ -226,7 +259,7 @@ export function AdminHeader() {
                 <SheetClose asChild>
                   <Link
                     href="/system/admin/painel/clientes"
-                    className="text-sm font-bold text-[#4c1d95] uppercase hover:text-[#7c3aed]"
+                    className={MOBILE_MAIN_LINK}
                   >
                     Clientes
                   </Link>
@@ -234,7 +267,7 @@ export function AdminHeader() {
                 <SheetClose asChild>
                   <Link
                     href="/system/admin/painel/clientes-penalizados"
-                    className="text-sm font-bold text-[#4c1d95] uppercase hover:text-[#7c3aed]"
+                    className={MOBILE_MAIN_LINK}
                   >
                     Clientes Penalizados
                   </Link>
