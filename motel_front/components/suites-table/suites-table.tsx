@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Pencil } from "lucide-react";
-import { SuitesTableProps } from "@/components/suites-table/suites-table.type";
+import { SuitesTableProps } from "@/components/suites-table/suites-table.types";
 
 export function SuitesTable({ data }: SuitesTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,7 +47,7 @@ export function SuitesTable({ data }: SuitesTableProps) {
         <Table>
           <TableHeader className="bg-gray-100">
             <TableRow>
-              <TableHead className="w-[300px] font-bold text-[#4c1d95]">
+              <TableHead className="w-75 font-bold text-[#4c1d95]">
                 Nome da Suíte
               </TableHead>
               <TableHead className="font-bold text-[#4c1d95]">
@@ -79,7 +79,7 @@ export function SuitesTable({ data }: SuitesTableProps) {
                       variant="outline"
                       size="sm"
                       className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                      onClick={() => console.log(`Editar suite ${item.id}`)}
+                      onClick={() => alert("Funcionalidade em desenvolvimento")}
                     >
                       <Pencil className="w-3 h-3 mr-2" />
                       Editar
