@@ -1,13 +1,13 @@
 "use client";
-import { Header } from "@/components/header/Header";
+import { Header } from "@/components/header";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { getRoomByPublicId } from "@/actions/rooms";
-import { SuiteDetailCarousel } from "@/components/suite-detail-carousel.tsx/SuiteDetailCarousel";
-import { BookingSection } from "@/components/booking-section/BookingSection";
+import { BookingSection } from "@/components/booking-section";
 import { useUserStore } from "@/store/user-store";
-import { SuitesSection } from "@/components/suites-section/SuitesSection";
-import { LocationSection } from "@/components/location-section/LocationSection";
+import { SuitesSection } from "@/components/suites-section";
+import { LocationSection } from "@/components/location-section";
+import { SuiteDetailCarousel } from "@/components/suite-detail-carousel";
 
 export default function RoomPage() {
   const params = useParams();

@@ -16,7 +16,7 @@ import {
   FileText,
 } from "lucide-react";
 
-import { AdminHeader } from "@/components/header/AdminHeader";
+import { AdminHeader } from "@/components/admin-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

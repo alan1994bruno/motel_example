@@ -1,10 +1,8 @@
 "use client";
 
-import { AdminHeader } from "@/components/header/AdminHeader";
-import {
-  ClientsTable,
-  ClientData,
-} from "@/components/clients-table/ClientsTable";
+import { AdminHeader } from "@/components/admin-header";
+import { ClientsTable } from "@/components/clients-table";
+import type { ClientData } from "@/components/clients-table";
 import { getUsersClient } from "@/actions/user";
 import { useCallback, useEffect, useState } from "react";
 

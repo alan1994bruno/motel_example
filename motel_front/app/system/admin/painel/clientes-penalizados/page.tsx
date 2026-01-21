@@ -1,11 +1,8 @@
 "use client";
 
-import * as React from "react";
-import { AdminHeader } from "@/components/header/AdminHeader";
-import {
-  PenalizedClientsTable,
-  PenalizedClientData,
-} from "@/components/penalized-clients-table/PenalizedClientsTable";
+import { AdminHeader } from "@/components/admin-header";
+import { PenalizedClientsTable } from "@/components/penalized-clients-table";
+import type { PenalizedClientData } from "@/components/penalized-clients-table";
 import { getUserClientPenalized } from "@/actions/user";
 import { useCallback, useEffect, useState } from "react";
 

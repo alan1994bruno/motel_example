@@ -4,13 +4,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-
-interface Suites {
-  name: string;
-  price: string;
-  image: string;
-  publicId: string;
-}
+import type { Suites } from "@/components/suites-section";
 
 export function SuitesSection() {
   const [suites, setSuites] = useState<Suites[]>([]);

@@ -1,7 +1,6 @@
-import { Header } from "@/components/header/Header";
-import { LocationSection } from "@/components/location-section/LocationSection";
-import { SuitesSection } from "@/components/suites-section/SuitesSection";
-import Image from "next/image";
+import { Header } from "@/components/header";
+import { LocationSection } from "@/components/location-section";
+import { SuitesSection } from "@/components/suites-section";
 
 export default function Home() {
   return (

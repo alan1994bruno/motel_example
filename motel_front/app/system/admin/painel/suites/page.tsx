@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
-import { AdminHeader } from "@/components/header/AdminHeader";
-import { SuitesTable, SuiteData } from "@/components/suites-table/SuitesTable";
+import { AdminHeader } from "@/components/admin-header";
+import { SuitesTable } from "@/components/suites-table";
+import type { SuiteData } from "@/components/suites-table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";

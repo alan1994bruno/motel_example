@@ -1,6 +1,5 @@
-// app/login/page.tsx
-import { Header } from "@/components/header/Header"; // Seu header roxo
-import { AuthCard } from "@/components/auth-card/AuthCard";
+import { Header } from "@/components/header/header";
+import { AuthCard } from "@/components/auth-card";
 
 export default function LoginPage() {
   return (

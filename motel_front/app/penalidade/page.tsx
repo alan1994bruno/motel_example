@@ -2,7 +2,7 @@
 
 import { AlertOctagon, MapPin, Wallet, ArrowRight } from "lucide-react";
 
-import { Header } from "@/components/header/Header";
+import { Header } from "@/components/header/header";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -14,8 +14,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { SuitesSection } from "@/components/suites-section/SuitesSection";
-import { LocationSection } from "@/components/location-section/LocationSection";
+import { SuitesSection } from "@/components/suites-section";
+import { LocationSection } from "@/components/location-section";
 import { useCallback, useEffect, useState } from "react";
 import { getPenalty } from "@/actions/penality";
 import { Payment } from "@/types/penality.type";

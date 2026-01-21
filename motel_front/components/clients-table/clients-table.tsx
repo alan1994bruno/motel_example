@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -15,20 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-// Interface dos dados do Cliente
-export interface ClientData {
-  id: string;
-  email: string;
-  isPenalized: boolean; // true = Sim, false = Não
-}
-
-interface ClientsTableProps {
-  data: ClientData[];
-  totalClients: number;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-  currentPage: number;
-}
+import { ClientsTableProps } from "@/components/clients-table";
 
 export function ClientsTable({
   data,

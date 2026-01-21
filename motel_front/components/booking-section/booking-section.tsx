@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { addDays, format } from "date-fns";
-import { ptBR, ro } from "date-fns/locale";
+import { ptBR } from "date-fns/locale";
 import { Calendar as CalendarIcon, Clock, AlertCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -30,13 +30,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { saveReservation } from "@/actions/reservation";
 import { useRouter } from "next/navigation";
-
-interface BookingSectionProps {
-  isLoggedIn: boolean;
-  pricePerHour: number;
-  roomPublicId: string;
-  suiteName: string;
-}
+import type { BookingSectionProps } from "@/components/booking-section";
 
 export function BookingSection({
   isLoggedIn,
@@ -167,7 +161,7 @@ export function BookingSection({
                       variant={"outline"}
                       className={cn(
                         "w-full justify-start text-left font-normal h-12",
-                        !date && "text-muted-foreground"
+                        !date && "text-muted-foreground",
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />

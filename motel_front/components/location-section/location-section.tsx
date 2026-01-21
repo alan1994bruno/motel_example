@@ -1,4 +1,3 @@
-import * as React from "react";
 import { MapPin } from "lucide-react";
 import { Card } from "@/components/ui/card";
 

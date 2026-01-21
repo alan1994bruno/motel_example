@@ -1,11 +1,8 @@
 "use client";
 
-import * as React from "react";
-import { AdminHeader } from "@/components/header/AdminHeader";
-import {
-  ReservationsTable,
-  ReservationData,
-} from "@/components/reservations-table/ReservationsTable";
+import { AdminHeader } from "@/components/admin-header";
+import { ReservationsTable } from "@/components/reservations-table";
+import type { ReservationData } from "@/components/reservations-table";
 
 // --- MOCK DE DADOS (Simulando Reservas Canceladas) ---
 // Note que a estrutura é a mesma que a tabela espera

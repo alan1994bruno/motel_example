@@ -1,18 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { format, differenceInHours, addDays, set } from "date-fns";
-import { ptBR, ro } from "date-fns/locale";
+import { format, differenceInHours } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import {
   AlertTriangle,
-  ArrowRight,
   CalendarDays,
   CalendarX,
   Clock,
   MapPin,
 } from "lucide-react";
 
-import { Header } from "@/components/header/Header";
+import { Header } from "@/components/header/header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -35,17 +34,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { use, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { cancelReservation, getMyReservation } from "@/actions/reservation";
 import { ReservationSummary } from "@/types/reresvation.type";
-import Link from "next/link";
-import { SuitesSection } from "@/components/suites-section/SuitesSection";
+import { SuitesSection } from "@/components/suites-section";
 import { useRouter } from "next/navigation";
-import { LocationSection } from "@/components/location-section/LocationSection";
+import { LocationSection } from "@/components/location-section";
 
 export default function ReservationPage() {
   const [reservation, setReservation] = useState<ReservationSummary | null>(
-    null
+    null,
   );
 
   // Estados derivados para controle da regra de negócio

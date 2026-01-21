@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   Table,
   TableBody,
@@ -13,27 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { checkin, conclusionReservation } from "@/actions/reservation";
-
-// Interface dos dados que a tabela espera receber
-export interface ReservationData {
-  id: string;
-  suiteName: string;
-  userEmail: string;
-  price: number;
-  checkinTime: string;
-  checkoutTime: string;
-  occupied: boolean;
-  // Adicione outros campos se necessário (ex: status, data)
-}
-
-interface ReservationsTableProps {
-  data: ReservationData[];
-  isOccupied?: boolean;
-  totalItems: number;
-  currentPage: number;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-  getActiveReservations?: () => Promise<void>;
-}
+import type { ReservationsTableProps } from "@/components/reservations-table";
 
 function calculateDurationInHours(start: string, end: string): number {
   const startDate = new Date(start);
@@ -58,8 +37,6 @@ export function ReservationsTable({
 }: ReservationsTableProps) {
   const itemsPerPage = 10;
 
-  // --- LÓGICA DE PAGINAÇÃO INTERNA ---
-  // Calcula o número total de páginas baseado no tamanho do array recebido
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   // Garante que se os dados mudarem, a página não fique num índice inválido

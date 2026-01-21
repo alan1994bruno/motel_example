@@ -1,4 +1,3 @@
-import * as React from "react";
 import Image from "next/image";
 import {
   Carousel,
@@ -8,12 +7,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
-
-// Interface para definir o que o componente espera receber
-interface SuiteDetailCarouselProps {
-  suiteName: string;
-  images: string[]; // Array de caminhos das imagens
-}
+import type { SuiteDetailCarouselProps } from "@/components/suite-detail-carousel";
 
 export function SuiteDetailCarousel({
   suiteName,
@@ -21,13 +15,9 @@ export function SuiteDetailCarousel({
 }: SuiteDetailCarouselProps) {
   return (
     <div className="w-full flex flex-col items-center py-8">
-      {/* 1. TÍTULO DA SUÍTE */}
-      {/* Cor vermelha e uppercase conforme o print e a identidade visual anterior */}
       <h1 className="text-3xl md:text-4xl font-bold text-[#e11d48] uppercase mb-8 tracking-wide">
         {suiteName}
       </h1>
-
-      {/* 2. CARROSSEL */}
       <Carousel
         className="w-full max-w-4xl px-4 md:px-0" // Limita a largura em telas grandes
         opts={{

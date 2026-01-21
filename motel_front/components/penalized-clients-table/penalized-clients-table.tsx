@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,25 +10,21 @@ import {
   TableFooter,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Pencil } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ChevronLeft, ChevronRight, AlertOctagon, Trash2 } from "lucide-react";
+import { removePenalty } from "@/actions/penality";
+import { useRouter } from "next/navigation";
+import type { PenalizedClientsTableProps } from "@/components/penalized-clients-table";
 
-// Interface dos dados da Suíte
-export interface SuiteData {
-  id: string;
-  name: string;
-  price: number;
-  units: number; // Quantidade de quartos desse tipo
-}
-
-interface SuitesTableProps {
-  data: SuiteData[];
-}
-
-export function SuitesTable({ data }: SuitesTableProps) {
-  const [currentPage, setCurrentPage] = useState(1);
+export function PenalizedClientsTable({
+  data,
+  totalClients,
+  setCurrentPage,
+  currentPage,
+}: PenalizedClientsTableProps) {
   const itemsPerPage = 10;
+  const router = useRouter();
 
-  // --- PAGINAÇÃO ---
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
   if (currentPage > totalPages && totalPages > 0) {
@@ -41,61 +35,70 @@ export function SuitesTable({ data }: SuitesTableProps) {
   const endIndex = startIndex + itemsPerPage;
   const currentItems = data.slice(startIndex, endIndex);
 
-  // --- SOMA DE UNIDADES (Capacidade total na página) ---
-  const totalUnitsOnPage = currentItems.reduce(
-    (acc, curr) => acc + curr.units,
-    0
-  );
+  console.log("Itens atuais na tabela de penalizados:", data);
 
-  // Formatador
-  const formatMoney = (val: number) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(val);
+  const handleRemovePenalty = async (id: string, email: string) => {
+    // Aqui você conectaria com sua API para deletar a penalidade
+    if (
+      confirm(
+        `Tem certeza que deseja remover a penalidade do cliente ${email}?`,
+      )
+    ) {
+      await removePenalty(id);
+      console.log(`Removendo penalidade ID: ${id}`);
+      router.refresh();
+    }
+  };
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-md border shadow-sm">
+      <div className="bg-white rounded-md border shadow-sm border-l-4 border-l-red-500">
         <Table>
           <TableHeader className="bg-gray-100">
             <TableRow>
-              <TableHead className="w-[300px] font-bold text-[#4c1d95]">
-                Nome da Suíte
-              </TableHead>
               <TableHead className="font-bold text-[#4c1d95]">
-                Preço/hora
+                Email do Cliente
               </TableHead>
-              <TableHead className="font-bold text-[#4c1d95] text-center">
-                Unidades
+              <TableHead className="w-[150px] font-bold text-[#4c1d95] text-center">
+                Status
               </TableHead>
-              <TableHead className="text-right font-bold text-[#4c1d95]">
+              <TableHead className="w-[120px] text-right font-bold text-[#4c1d95]">
                 Ações
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {currentItems.length > 0 ? (
-              currentItems.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium text-gray-700">
-                    {item.name}
+              currentItems.map((client) => (
+                <TableRow key={client.id}>
+                  <TableCell className="font-medium text-gray-700 flex items-center gap-2">
+                    <AlertOctagon className="w-4 h-4 text-red-500" />
+                    {client.email}
                   </TableCell>
-                  <TableCell className="text-gray-600">
-                    {formatMoney(item.price)}
+
+                  <TableCell className="text-center">
+                    <Badge
+                      variant="destructive"
+                      className="bg-red-600 hover:bg-red-700 uppercase"
+                    >
+                      Penalizado
+                    </Badge>
                   </TableCell>
-                  <TableCell className="text-center font-bold text-gray-800 bg-gray-50 rounded-sm">
-                    {item.units}
-                  </TableCell>
+
                   <TableCell className="text-right">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                      onClick={() => console.log(`Editar suite ${item.id}`)}
+                      className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                      onClick={() =>
+                        handleRemovePenalty(
+                          client.penalty.publicId,
+                          client.email,
+                        )
+                      }
                     >
-                      <Pencil className="w-3 h-3 mr-2" />
-                      Editar
+                      <Trash2 className="w-3 h-3 mr-2" />
+                      Remover
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -103,26 +106,22 @@ export function SuitesTable({ data }: SuitesTableProps) {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={3}
                   className="h-24 text-center text-gray-500"
                 >
-                  Nenhuma suíte cadastrada.
+                  Nenhum cliente penalizado no momento.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
 
-          {/* Rodapé somando as unidades disponíveis na visualização atual */}
           <TableFooter className="bg-gray-50 border-t-2 border-t-[#4c1d95]/20">
             <TableRow>
-              <TableCell
-                colSpan={2}
-                className="text-right font-bold uppercase text-xs text-gray-500"
-              >
-                Total de Unidades (nesta página)
+              <TableCell className="text-right font-bold uppercase text-xs text-gray-500">
+                Total nesta página:
               </TableCell>
-              <TableCell className="text-center font-extrabold text-[#4c1d95] text-lg">
-                {totalUnitsOnPage}
+              <TableCell className="text-center font-extrabold text-[#e11d48] text-lg">
+                {currentItems.length}
               </TableCell>
               <TableCell />
             </TableRow>
