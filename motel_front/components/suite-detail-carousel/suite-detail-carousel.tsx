@@ -1,13 +1,13 @@
-import Image from "next/image";
+import Image from "next/image"; // 1. Next.js
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Card, CardContent } from "@/components/ui/card";
-import type { SuiteDetailCarouselProps } from "@/components/suite-detail-carousel";
+} from "@/components/ui/carousel"; // 2. UI shadcn
+import { Card, CardContent } from "@/components/ui/card"; // 3. UI Card
+import type { SuiteDetailCarouselProps } from "./suite-detail-carousel.types"; // 4. Local
 
 export function SuiteDetailCarousel({
   suiteName,
@@ -40,7 +40,7 @@ export function SuiteDetailCarousel({
                     />
 
                     {/* Overlay sutil para garantir contraste das setas (opcional) */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent pointer-events-none" />
                   </CardContent>
                 </Card>
               </div>
