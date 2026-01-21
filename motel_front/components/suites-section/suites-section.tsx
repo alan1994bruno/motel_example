@@ -1,10 +1,10 @@
 "use client";
-import { getRooms } from "@/actions/rooms";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import type { Suites } from "@/components/suites-section";
+import { Button } from "@/components/ui/button";
+import { getRooms } from "@/actions/rooms";
+import type { Suites } from "./suites-section.types";
 
 export function SuitesSection() {
   const [suites, setSuites] = useState<Suites[]>([]);
@@ -50,7 +50,7 @@ export function SuitesSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {suites.map((suite, index) => (
             <div
-              key={index}
+              key={suite.publicId}
               // 'group' no pai é essencial para ativar o hover nos filhos
               // 'overflow-hidden' impede que a imagem zoomada saia do card
               className="group relative h-64 md:h-72 w-full overflow-hidden rounded-sm shadow-md cursor-pointer"

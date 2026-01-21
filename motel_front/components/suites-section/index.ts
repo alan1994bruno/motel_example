@@ -1,2 +1,2 @@
 export * from "./suites-section";
-export type { Suites } from "./suites-section.type";
+export type { Suites } from "./suites-section.types";
