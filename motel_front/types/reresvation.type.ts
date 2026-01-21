@@ -74,6 +74,12 @@ export interface ReservationItem {
   user: UserData;
 }
 
+export type ReservationRequest = {
+  roomPublicId: string; // uuid
+  checkinTime: string; // ISO 8601 datetime
+  checkoutTime: string; // ISO 8601 datetime
+};
+
 // --- 4. Estrutura de Paginação (Genérica) ---
 
 export interface SortInfo {

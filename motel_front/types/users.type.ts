@@ -33,3 +33,11 @@ export type User = {
   role: UserRole;
   profile: UserProfile;
 };
+
+export interface UpdateUserClientData {
+  email: string;
+  phone: string;
+  cpf: string;
+  cep: string;
+  password?: string; // <--- (Opcional)
+}

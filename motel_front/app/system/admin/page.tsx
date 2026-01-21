@@ -1,14 +1,16 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form"; // 1. React Hooks
+import * as yup from "yup"; // 2. Libs
+import { yupResolver } from "@hookform/resolvers/yup"; // 3. Resolvers
+import { Button } from "@/components/ui/button"; // 4. UI Button
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/card"; // 4. UI Card
 import {
   Form,
   FormControl,
@@ -16,13 +18,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import * as yup from "yup";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { loginUser } from "@/actions/login-user";
-import { useUserStore } from "@/store/user-store";
-import { useRouter } from "next/navigation";
+} from "@/components/ui/form"; // 4. UI Form
+import { Input } from "@/components/ui/input"; // 4. UI Input
+import { loginUser } from "@/actions/login-user"; // 5. Actions
+import { useUserStore } from "@/store/user-store"; // 6. Store
+import { useRouter } from "next/navigation"; // 7. Next.js
 
 const loginSchema = yup.object({
   email: yup.string().email("Email inválido").required("O email é obrigatório"),
@@ -36,17 +36,18 @@ export default function AdminLoginPage() {
     resolver: yupResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
-
+  const setEmail = useUserStore((state) => state.setEmail);
   const router = useRouter();
 
   const onSubmit = async (data: LoginFormData) => {
-    console.log("Login Data:", data);
-    const result = await loginUser(data);
-
-    console.log("Login Result:", result);
-    if (result.success && result.data) {
-      useUserStore.getState().setEmail(result.data); // salva no store
-      router.replace("/system/admin/painel"); // redireciona para a página inicial
+    try {
+      const result = await loginUser(data);
+      if (result.email) {
+        setEmail(result.email);
+        router.replace("/system/admin/painel"); // redireciona para a página inicial
+      }
+    } catch {
+      form.setError("root", { message: "Falha no login" });
     }
   };
 
@@ -54,7 +55,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 p-4">
       {/* CARD DE LOGIN */}
       {/* 'border-t-4 border-t-[#4c1d95]' cria a linha roxa no topo conforme a imagem */}
-      <Card className="w-full max-w-[400px] shadow-xl border-t-4 border-t-[#4c1d95] bg-white">
+      <Card className="w-full max-w-100 shadow-xl border-t-4 border-t-[#4c1d95] bg-white">
         <CardHeader className="space-y-1 pb-6">
           <CardTitle className="text-2xl font-bold text-[#4c1d95]">
             Bem-vindo de volta

@@ -12,20 +12,21 @@ export default function ActiveReservationsPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const getActiveReservations = useCallback(async () => {
-    const res = await getReservationActive();
-    setTotalReservations(res.totalElements);
-    console.log("Active Reservations Data from API:", res.content);
-    setReservations(
-      res.content.map((reservation) => ({
-        id: reservation.publicId,
-        suiteName: reservation.room.name,
-        userEmail: reservation.user.email,
-        price: reservation.room.hourlyRate,
-        checkinTime: reservation.checkinTime,
-        checkoutTime: reservation.checkoutTime,
-        occupied: reservation.occupied,
-      })),
-    );
+    try {
+      const res = await getReservationActive();
+      setTotalReservations(res.totalElements);
+      setReservations(
+        res.content.map((reservation) => ({
+          id: reservation.publicId,
+          suiteName: reservation.room.name,
+          userEmail: reservation.user.email,
+          price: reservation.room.hourlyRate,
+          checkinTime: reservation.checkinTime,
+          checkoutTime: reservation.checkoutTime,
+          occupied: reservation.occupied,
+        })),
+      );
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -53,7 +54,6 @@ export default function ActiveReservationsPage() {
           </div>
         </div>
 
-        {/* Uso do Componente Reutilizável */}
         <ReservationsTable
           currentPage={currentPage}
           totalItems={totalReservations}

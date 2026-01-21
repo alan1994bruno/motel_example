@@ -1,36 +1,37 @@
 "use client";
 
-import { getReservationCompleted } from "@/actions/reservation";
-import { AdminHeader } from "@/components/admin-header";
-import { ReservationsTable } from "@/components/reservations-table";
-import type { ReservationData } from "@/components/reservations-table";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react"; // 1. React
+import { getReservationCompleted } from "@/actions/reservation"; // 2. Actions
+import { AdminHeader } from "@/components/admin-header"; // 3. Components
+import { ReservationsTable } from "@/components/reservations-table"; // 3. Components
+import type { ReservationData } from "@/components/reservations-table"; // 4. Types
 
 export default function CompletedReservationsPage() {
   const [totalReservations, setTotalReservations] = useState(0);
   const [reservations, setReservations] = useState<ReservationData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const getActiveReservations = useCallback(async () => {
-    const res = await getReservationCompleted();
-    setTotalReservations(res.totalElements);
-    console.log("Active Reservations Data from API:", res.content);
-    setReservations(
-      res.content.map((reservation) => ({
-        id: reservation.publicId,
-        suiteName: reservation.room.name,
-        userEmail: reservation.user.email,
-        price: reservation.room.hourlyRate,
-        checkinTime: reservation.checkinTime,
-        checkoutTime: reservation.checkoutTime,
-        occupied: reservation.occupied,
-      })),
-    );
+  const getCompletedReservations = useCallback(async () => {
+    try {
+      const res = await getReservationCompleted();
+      setTotalReservations(res.totalElements);
+      setReservations(
+        res.content.map((reservation) => ({
+          id: reservation.publicId,
+          suiteName: reservation.room.name,
+          userEmail: reservation.user.email,
+          price: reservation.room.hourlyRate,
+          checkinTime: reservation.checkinTime,
+          checkoutTime: reservation.checkoutTime,
+          occupied: reservation.occupied,
+        })),
+      );
+    } catch {}
   }, []);
 
   useEffect(() => {
-    getActiveReservations();
-  }, [getActiveReservations]);
+    getCompletedReservations();
+  }, [getCompletedReservations]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

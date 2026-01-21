@@ -1,21 +1,38 @@
 "use client";
 
-import { AdminHeader } from "@/components/admin-header";
-import { ReservationsTable } from "@/components/reservations-table";
+import { useCallback, useEffect, useState } from "react"; // 1. React
+import { getReservationCancelled } from "@/actions/reservation"; // 2. Actions
+import { AdminHeader } from "@/components/admin-header"; // 3. Components
+import { ReservationsTable } from "@/components/reservations-table"; // 3. Components
 import type { ReservationData } from "@/components/reservations-table";
 
-// --- MOCK DE DADOS (Simulando Reservas Canceladas) ---
-// Note que a estrutura é a mesma que a tabela espera
-const mockCancelledReservations: ReservationData[] = Array.from({
-  length: 15,
-}).map((_, i) => ({
-  id: `cancel-${i + 1}`,
-  suiteName: i % 3 === 0 ? "Suíte Duplex Master" : "Suíte Self",
-  userEmail: `cancelado${i + 1}@email.com`,
-  price: i % 3 === 0 ? 299.9 : 69.9,
-}));
-
 export default function CancelledReservationsPage() {
+  const [totalReservations, setTotalReservations] = useState(0);
+  const [reservations, setReservations] = useState<ReservationData[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const getCancelledReservations = useCallback(async () => {
+    try {
+      const res = await getReservationCancelled();
+      setTotalReservations(res.totalElements);
+      setReservations(
+        res.content.map((reservation) => ({
+          id: reservation.publicId,
+          suiteName: reservation.room.name,
+          userEmail: reservation.user.email,
+          price: reservation.room.hourlyRate,
+          checkinTime: reservation.checkinTime,
+          checkoutTime: reservation.checkoutTime,
+          occupied: reservation.occupied,
+        })),
+      );
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    getCancelledReservations();
+  }, [getCancelledReservations]);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <AdminHeader />
@@ -34,13 +51,17 @@ export default function CancelledReservationsPage() {
           <div className="text-sm font-medium text-gray-600 bg-white px-4 py-2 rounded-md shadow-sm border">
             Total Cancelado:{" "}
             <span className="font-bold text-[#e11d48]">
-              {mockCancelledReservations.length}
+              {totalReservations}
             </span>
           </div>
         </div>
 
-        {/* Reutilizando a mesma Tabela */}
-        <ReservationsTable data={mockCancelledReservations} />
+        <ReservationsTable
+          data={reservations}
+          totalItems={totalReservations}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       </main>
     </div>
   );

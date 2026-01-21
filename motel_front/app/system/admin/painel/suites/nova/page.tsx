@@ -1,13 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { ArrowLeft, Save, Image as ImageIcon } from "lucide-react";
-
-import { AdminHeader } from "@/components/admin-header";
+import Link from "next/link"; // 1. Next.js
+import { useRouter } from "next/navigation"; // 1. Next.js
+import { useForm } from "react-hook-form"; // 2. React Hooks
+import * as yup from "yup"; // 3. Libs
+import { yupResolver } from "@hookform/resolvers/yup"; // 4. Resolvers
+import { ArrowLeft, Save, Image as ImageIcon } from "lucide-react"; // 5. Icons
+import { AdminHeader } from "@/components/admin-header"; // 6. Components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,7 +15,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import {
   Form,
@@ -74,15 +72,18 @@ export default function NewSuitePage() {
   });
 
   const onSubmit = async (data: SuiteFormValues) => {
-    console.log("Form Data Submitted:", data);
-    await createRoom({
-      name: data.name,
-      hourlyRate: data.price,
-      units: data.units,
-      images: [data.url1, data.url2, data.url3],
-    });
-    alert("Suíte cadastrada com sucesso!");
-    router.push("/system/admin/painel/suites");
+    try {
+      await createRoom({
+        name: data.name,
+        hourlyRate: data.price,
+        units: data.units,
+        images: [data.url1, data.url2, data.url3],
+      });
+      router.push("/system/admin/painel/suites");
+      router.refresh();
+    } catch (error) {
+      form.setError("root", { message: "Erro ao cadastrar suíte" });
+    }
   };
 
   return (
@@ -151,9 +152,6 @@ export default function NewSuitePage() {
                             step="0.01"
                             placeholder="0,00"
                             {...field}
-                            onChange={(e) =>
-                              field.onChange(parseFloat(e.target.value))
-                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -175,9 +173,6 @@ export default function NewSuitePage() {
                             step="1"
                             placeholder="1"
                             {...field}
-                            onChange={(e) =>
-                              field.onChange(parseFloat(e.target.value))
-                            }
                           />
                         </FormControl>
                         <FormMessage />
