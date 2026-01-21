@@ -1,36 +1,35 @@
 "use client";
 
-import * as React from "react";
-import { addDays, format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { Calendar as CalendarIcon, Clock, AlertCircle } from "lucide-react";
-
+import { useCallback, useEffect, useState } from "react"; // 1. React
+import { addDays, format, set } from "date-fns"; // 2. Libs
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { ptBR } from "date-fns/locale";
+import { CalendarIcon, Clock, AlertCircle } from "lucide-react"; // 3. Icons
+import { Button } from "@/components/ui/button"; // 4. UI Button
+import { Calendar } from "@/components/ui/calendar"; // 4. UI Calendar
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/ui/popover"; // 4. UI Popover
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"; // 4. UI Select
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { saveReservation } from "@/actions/reservation";
-import { useRouter } from "next/navigation";
-import type { BookingSectionProps } from "@/components/booking-section";
+} from "@/components/ui/card"; // 4. UI Card
+import { Alert, AlertDescription } from "@/components/ui/alert"; // 4. UI Alert
+import { saveReservation } from "@/actions/reservation"; // 5. Actions
+import { useRouter } from "next/navigation"; // 6. Next.js
+import type { BookingSectionProps } from "./booking-section.types"; // 7. Local
 
 export function BookingSection({
   isLoggedIn,
@@ -38,10 +37,11 @@ export function BookingSection({
   suiteName,
   roomPublicId,
 }: BookingSectionProps) {
-  const [date, setDate] = React.useState<Date>();
-  const [startHour, setStartHour] = React.useState<string>("");
-  const [endHour, setEndHour] = React.useState<string>("");
+  const [date, setDate] = useState<Date>();
+  const [startHour, setStartHour] = useState<string>("");
+  const [endHour, setEndHour] = useState<string>("");
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   // --- REGRAS DE DATA ---
   const today = new Date();
@@ -92,18 +92,17 @@ export function BookingSection({
     const checkinTime = format(dataEntrada, "yyyy-MM-dd'T'HH:mm:ss");
     const checkoutTime = format(dataSaida, "yyyy-MM-dd'T'HH:mm:ss");
 
-    // Console log para você validar
-
-    await saveReservation({
-      roomPublicId,
-      checkinTime,
-      checkoutTime,
-    });
-
-    router.replace("/minha-reserva");
-
-    // Aqui você faria o fetch/axios post
-    // await api.post('/reservas', { ... })
+    try {
+      setIsLoading(true);
+      await saveReservation({
+        roomPublicId,
+        checkinTime,
+        checkoutTime,
+      });
+      router.replace("/minha-reserva");
+    } catch {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -142,7 +141,7 @@ export function BookingSection({
 
               <Button
                 className="w-full bg-[#5b21b6] hover:bg-[#4c1d95] text-white font-bold py-6 uppercase"
-                onClick={() => (window.location.href = "/login")} // Exemplo de redirecionamento
+                onClick={() => router.push("/login")}
               >
                 Login / Criar Conta para Reservar
               </Button>
@@ -251,9 +250,10 @@ export function BookingSection({
                   </div>
                   <Button
                     className="w-full bg-[#e11d48] hover:bg-[#be123c] text-white font-bold py-6 uppercase"
+                    disabled={isLoading}
                     onClick={handleBooking}
                   >
-                    Confirmar Reserva
+                    {isLoading ? "Confirmando..." : "Confirmar Reserva"}
                   </Button>
                 </div>
               )}
