@@ -1,34 +1,43 @@
 "use client";
 
+import { getRoomsPage } from "@/actions/rooms";
 import { AdminHeader } from "@/components/admin-header";
 import { SuitesTable } from "@/components/suites-table";
 import type { SuiteData } from "@/components/suites-table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-// --- MOCK DE DADOS ---
-const mockSuites: SuiteData[] = [
-  { id: "1", name: "Suíte Self", price: 69.9, units: 5 },
-  { id: "2", name: "Suíte Self Plus", price: 79.9, units: 3 },
-  { id: "3", name: "Suíte Erótica", price: 99.9, units: 4 },
-  { id: "4", name: "Suíte Nudes Hidro", price: 129.9, units: 2 },
-  { id: "5", name: "Suíte Erótica Hidro", price: 139.9, units: 2 },
-  { id: "6", name: "Suíte Erótica Hidro Plus", price: 159.9, units: 1 },
-  { id: "7", name: "Suíte Duplex Hidro", price: 179.9, units: 2 },
-  { id: "8", name: "Suíte Duplex Master", price: 299.9, units: 1 },
-  // ... duplicando para testar paginação
-  { id: "9", name: "Suíte Teste A", price: 50.0, units: 10 },
-  { id: "10", name: "Suíte Teste B", price: 55.0, units: 8 },
-  { id: "11", name: "Suíte Teste C", price: 60.0, units: 5 },
-];
+import { useCallback, useEffect, useState } from "react";
 
 export default function SuitesPage() {
   const router = useRouter();
+  const [room, setRooms] = useState<SuiteData[]>([]);
+  const [totalClients, setTotalClients] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const navigateToNewSuite = () => {
     router.push("/system/admin/painel/suites/nova");
   };
+
+  const getData = useCallback(async () => {
+    try {
+      const data = await getRoomsPage(currentPage);
+      console.log("data ", data);
+      setRooms(
+        data.content.map((it) => ({
+          id: it.publicId,
+          name: it.name,
+          price: it.hourlyRate,
+          units: it.units,
+        })),
+      );
+      setTotalClients(data.totalElements);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -50,7 +59,7 @@ export default function SuitesPage() {
             <div className="text-sm font-medium text-gray-600 bg-white px-4 py-2 rounded-md shadow-sm border flex items-center">
               Total de Tipos:{" "}
               <span className="font-bold text-[#4c1d95] ml-1">
-                {mockSuites.length}
+                {totalClients}
               </span>
             </div>
 
@@ -66,7 +75,12 @@ export default function SuitesPage() {
         </div>
 
         {/* Tabela de Suítes */}
-        <SuitesTable data={mockSuites} />
+        <SuitesTable
+          setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
+          data={room}
+          totalClients={totalClients}
+        />
       </main>
     </div>
   );
