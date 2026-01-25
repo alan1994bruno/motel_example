@@ -20,9 +20,3 @@ export interface RoomType {
   units: number;
   images: RoomImage[];
 }
-
-export type RoomTypeList = RoomType[];
-
-export type RoomResponse = {
-  data: RoomTypeList;
-};

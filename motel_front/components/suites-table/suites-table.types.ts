@@ -7,4 +7,7 @@ export interface SuiteData {
 
 export interface SuitesTableProps {
   data: SuiteData[];
+  totalClients: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  currentPage: number;
 }

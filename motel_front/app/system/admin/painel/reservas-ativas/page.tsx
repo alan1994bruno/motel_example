@@ -14,6 +14,7 @@ export default function ActiveReservationsPage() {
   const getActiveReservations = useCallback(async () => {
     try {
       const res = await getReservationActive();
+      console.log(".>>>> ", res);
       setTotalReservations(res.totalElements);
       setReservations(
         res.content.map((reservation) => ({

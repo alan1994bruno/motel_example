@@ -10,14 +10,15 @@ export async function createUser(data: any) {
 export async function getUsersClient(
   page: number,
 ): Promise<PageResponse<User>> {
-  const res = await api.get<any>("/users/clients?page=" + page);
+  const res = await api.get("/users/clients?page=" + page);
+
   return res.data;
 }
 
 export async function getUserClientPenalized(
   page: number,
 ): Promise<PageResponse<User>> {
-  const res = await api.get<any>(`/users/penalized?page=${page}`);
+  const res = await api.get(`/users/penalized?page=${page}`);
   return res.data;
 }
 

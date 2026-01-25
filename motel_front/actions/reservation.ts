@@ -6,10 +6,9 @@ import {
   ReservationSummary,
   ReservationRequest,
 } from "@/types/reresvation.type";
-import { RoomResponse } from "@/types/rooms.type";
 
 export async function saveReservation(data: ReservationRequest): Promise<void> {
-  await api.post<RoomResponse>("/reservations", data);
+  await api.post("/reservations", data);
 }
 
 export async function getMyReservation(): Promise<ReservationSummary> {
@@ -22,11 +21,11 @@ export async function cancelReservation(publicId: string): Promise<void> {
 }
 
 export async function conclusionReservation(publicId: string): Promise<void> {
-  await api.put<RoomResponse>(`/reservations/${publicId}/complete`);
+  await api.put(`/reservations/${publicId}/complete`);
 }
 
 export async function checkin(publicId: string): Promise<void> {
-  await api.put<RoomResponse>(`/reservations/${publicId}/checkin`);
+  await api.put(`/reservations/${publicId}/checkin`);
 }
 
 async function getReservationsByStatus(
