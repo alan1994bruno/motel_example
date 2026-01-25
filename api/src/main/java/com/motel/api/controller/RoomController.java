@@ -2,6 +2,7 @@ package com.motel.api.controller;
 import com.motel.api.dto.RoomDTO;
 import com.motel.api.model.Room;
 import com.motel.api.service.RoomService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +32,11 @@ public class RoomController {
     @GetMapping
     public ResponseEntity<List<Room>> listAll() {
         return ResponseEntity.ok(roomService.listAll());
+    }
+
+    @GetMapping("page")
+    public ResponseEntity<Page<Room>> listAllPage(@RequestParam(defaultValue = "1") int page) {
+        return ResponseEntity.ok(roomService.listAll(page));
     }
 
     // 2. Rota de Busca Específica por UUID (Devolve Objeto Único)

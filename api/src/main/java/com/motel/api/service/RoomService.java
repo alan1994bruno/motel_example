@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class RoomService {
@@ -55,6 +59,17 @@ public class RoomService {
         System.out.println(">>>  "+uuid);
         return roomRepository.findByPublicId(uuid)
                 .orElseThrow(() -> new RuntimeException("Quarto não encontrado com o uuid: " + uuid));
+    }
+
+
+    public Page<Room> listAll(int page) {
+        // Regra: O usuário manda página 1, mas o Spring conta do 0.
+        int pageNumber = (page > 0) ? page - 1 : 0;
+
+        // Cria a paginação: (Pagina, Quantidade, Ordenação)
+        Pageable pageable = PageRequest.of(pageNumber, 10, Sort.by("id").ascending());
+
+        return roomRepository.findAll(pageable);
     }
 
 

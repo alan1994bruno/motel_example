@@ -44,19 +44,22 @@ public class ReservationService {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
+        System.out.println("1");
+
         // 2. Validação de Role (Apenas CLIENT)
         if (user.getRole().getLevel() != Role.Level.CLIENT) {
             throw new IllegalArgumentException("Apenas usuários CLIENT podem fazer reservas.");
         }
-
+        System.out.println("2");
         // 3. Validação de Caloteiro (Penalty)
         if (penaltyRepository.existsByUserId(user.getId())) {
             throw new IllegalArgumentException("Você possui multas pendentes. Regularize sua situação.");
         }
 
+        System.out.println("3");
         // --- NOVA REGRA 1: UMA RESERVA POR VEZ ---
         // Se ele tem uma reserva que não ocupou e não foi multada, ele não pode criar outra.
-        if (reservationRepository.existsByUserIdAndOccupiedFalseAndPenaltyAppliedFalseAndCancelledFalse(user.getId())) {
+        if (reservationRepository.existsByUserIdAndOccupiedFalseAndPenaltyAppliedFalseAndCancelledFalseAndCompletedFalse(user.getId())) {
             throw new IllegalArgumentException("Você já possui uma reserva ativa. Utilize-a antes de fazer uma nova.");
         }
 
@@ -65,15 +68,20 @@ public class ReservationService {
         LocalDateTime minDate = now.plusDays(3);  // Daqui a 3 dias
         LocalDateTime maxDate = now.plusDays(30); // Daqui a 30 dias
 
+        System.out.println("4");
+
         // Regra: Não pode ser antes de 3 dias
         if (data.checkinTime().isBefore(minDate)) {
             throw new IllegalArgumentException("Reservas devem ser feitas com no mínimo 3 dias de antecedência.");
         }
 
+        System.out.println("5");
         // Regra: Não pode ser depois de 30 dias
         if (data.checkinTime().isAfter(maxDate)) {
             throw new IllegalArgumentException("Não é possível agendar com mais de 30 dias de antecedência.");
         }
+
+        System.out.println("6");
 
         // --- NOVA REGRA: MÁXIMO DE 6 HORAS (ROTATIVIDADE) ---
         long durationInMinutes = Duration.between(data.checkinTime(), data.checkoutTime()).toMinutes();
@@ -82,7 +90,7 @@ public class ReservationService {
         }
         // -------------------------------------------------------
 
-
+        System.out.println("7");
 
         // Validação saída antes da entrada
         if (data.checkoutTime().isBefore(data.checkinTime())) {
@@ -95,11 +103,14 @@ public class ReservationService {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Quarto não encontrado"));
 
+
+        System.out.println("8");
         // Overbooking
         long occupiedUnits = reservationRepository.countOverlappingReservations(
                 room.getId(), data.checkinTime(), data.checkoutTime()
         );
 
+        System.out.println("9");
         if (occupiedUnits >= room.getUnits()) {
             throw new IllegalArgumentException("Não há vagas disponíveis para este quarto neste horário.");
         }
@@ -120,17 +131,20 @@ public class ReservationService {
         reservation.setCheckoutTime(data.checkoutTime());
         reservation.setPrice(totalPrice);
 
+        System.out.println("10");
+
         return reservationRepository.save(reservation);
     }
 
 
     public Reservation getMyActiveReservation(String userEmail) {
+        System.out.println("02");
         // 1. Achar o usuário pelo token
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
+        System.out.println("03");
         // 2. Buscar a reserva que está "travando" a agenda dele (Não ocupada e sem multa)
-        return reservationRepository.findByUserIdAndOccupiedFalseAndPenaltyAppliedFalseAndCancelledFalse(user.getId())
+        return reservationRepository.findByUserIdAndOccupiedFalseAndPenaltyAppliedFalseAndCancelledFalseAndCompletedFalse(user.getId())
                 .orElseThrow(() -> new RuntimeException("Você não possui nenhuma reserva ativa no momento."));
     }
 

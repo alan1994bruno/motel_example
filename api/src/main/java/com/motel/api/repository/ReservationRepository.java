@@ -37,8 +37,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // 3. Busca de reserva ativa (Adicionado: CancelledFalse)
     Optional<Reservation> findByUserIdAndOccupiedFalseAndPenaltyAppliedFalseAndCancelledFalse(Long userId);
 
+
+    Optional<Reservation> findByUserIdAndOccupiedFalseAndPenaltyAppliedFalseAndCancelledFalseAndCompletedFalse(Long userId);
+
     // 4. Verificação Simples (Adicionado: CancelledFalse)
-    boolean existsByUserIdAndOccupiedFalseAndPenaltyAppliedFalseAndCancelledFalse(Long userId);
+    boolean  existsByUserIdAndOccupiedFalseAndPenaltyAppliedFalseAndCancelledFalseAndCompletedFalse(Long userId);
 
     // Busca pelo Public ID (para o cancelamento)
     Optional<Reservation> findByPublicId(UUID publicId);

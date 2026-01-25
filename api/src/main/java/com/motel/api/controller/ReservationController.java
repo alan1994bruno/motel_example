@@ -52,9 +52,11 @@ public class ReservationController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName(); // O email vem daqui automaticamente
         try {
+            System.out.println("01");
             Reservation reservation = reservationService.getMyActiveReservation(email);
             return ResponseEntity.ok(reservation);
         } catch (RuntimeException e) {
+            System.out.println("04 "+e.getMessage());
             // Se não tiver reserva, pode retornar 404 Not Found
             return ResponseEntity.notFound().build();
         }
