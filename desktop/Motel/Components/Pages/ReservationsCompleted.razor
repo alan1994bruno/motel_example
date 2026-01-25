@@ -1,0 +1,261 @@
+﻿@page "/reservas-concluidas"
+@using Motel.Models
+@using Motel.Services
+@inject ReservationService ReservationService
+
+<div class="top-header">
+    <div class="title-section">
+        <h2 class="page-title">RESERVAS CONCLUÍDAS</h2>
+        <p class="page-subtitle">Histórico de estadias finalizadas</p>
+    </div>
+
+    <div class="top-badge">
+        Total Concluído: <strong>@totalItems</strong>
+    </div>
+</div>
+
+<div class="table-card">
+    @if (isLoading)
+    {
+        <div style="padding: 40px; text-align: center; color: #666;">
+            Carregando...
+        </div>
+    }
+    else if (reservations == null || !reservations.Any())
+    {
+        <div style="padding: 40px; text-align: center;">Nenhuma reserva concluída.</div>
+    }
+    else
+    {
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Suíte</th>
+                    <th style="text-align: left;">Email do Cliente</th>
+                    <th style="text-align: right;">Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in reservations)
+                {
+                    <tr>
+                        <td class="suite-name">@item.Room?.Name</td>
+                        <td class="client-email">@item.User?.Email</td>
+                        <td class="price-col">R$ @item.Price.ToString("F2")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2" style="text-align: right; color: #666; font-size: 0.85rem; font-weight: 600;">
+                        TOTAL DESTA PÁGINA
+                    </td>
+                    <td class="total-value">
+                        R$ @pageTotal.ToString("F2")
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    }
+</div>
+
+<div class="pagination-bar">
+    <span class="page-count">Página @(paginaAtual + 1) de @(totalPaginas == 0 ? 1 : totalPaginas)</span>
+
+    <div class="page-buttons">
+        <button disabled="@(paginaAtual == 0)" @onclick="PaginaAnterior">‹ Anterior</button>
+        <button disabled="@(paginaAtual >= totalPaginas - 1)" @onclick="ProximaPagina">Próxima ›</button>
+    </div>
+</div>
+
+@code {
+    private List<Reservation> reservations;
+    private int totalItems = 0;
+    private int paginaAtual = 0;
+    private int totalPaginas = 1;
+    private bool isLoading = true;
+    private decimal pageTotal = 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) await Carregar();
+    }
+
+    private async Task Carregar()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        // Chama o endpoint de Concluídas
+        var result = await ReservationService.GetCompletedAsync(paginaAtual);
+
+        if (result != null)
+        {
+            reservations = result.Content;
+            totalItems = result.TotalElements;
+            totalPaginas = result.TotalPages;
+
+            // Soma o total da página atual para exibir no rodapé
+            pageTotal = reservations.Sum(r => r.Price);
+        }
+        else
+        {
+            reservations = new List<Reservation>();
+            pageTotal = 0;
+        }
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task ProximaPagina()
+    {
+        if (paginaAtual < totalPaginas - 1)
+        {
+            paginaAtual++;
+            await Carregar();
+        }
+    }
+
+    private async Task PaginaAnterior()
+    {
+        if (paginaAtual > 0)
+        {
+            paginaAtual--;
+            await Carregar();
+        }
+    }
+}
+
+<style>
+    /* --- CSS REUTILIZADO E ADAPTADO --- */
+    body {
+        background-color: #fff;
+    }
+
+    .top-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        padding-top: 10px;
+    }
+
+ 
+    .page-title {
+        color: #2e7d32;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 0;
+        text-transform: uppercase;
+    }
+
+    .page-subtitle {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    .top-badge {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        color: #2e7d32;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Tabela */
+    .table-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        /* Cabeçalho Roxo (#4a148c) padrão do sistema */
+        .custom-table th {
+            background-color: #f9f9f9;
+            color: #4a148c;
+            font-weight: bold;
+            font-size: 0.9rem;
+            padding: 12px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .custom-table td {
+            padding: 12px 20px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+    .suite-name {
+        font-weight: 500;
+    }
+
+    .client-email {
+        color: #555;
+    }
+
+    .price-col {
+        text-align: right;
+        font-weight: bold;
+    }
+
+    /* Rodapé */
+    .custom-table tfoot tr {
+        background-color: #fafafa;
+        border-top: 2px solid #eee;
+    }
+
+    .custom-table tfoot td {
+        padding: 15px 20px;
+        border-bottom: none;
+    }
+
+    .total-value {
+        text-align: right;
+        color: #4a148c; 
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    /* Paginação */
+    .pagination-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .page-buttons button {
+        background: white;
+        border: 1px solid #ddd;
+        padding: 6px 14px;
+        border-radius: 15px;
+        color: #666;
+        margin-left: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .page-buttons button:hover:not([disabled]) {
+            background-color: #f3e5f5;
+            border-color: #ba68c8;
+            color: #4a148c;
+        }
+
+        .page-buttons button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+</style>

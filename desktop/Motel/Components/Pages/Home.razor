@@ -1,0 +1,152 @@
+﻿@page "/"
+@using Motel.Components.Layout
+@using Motel.Services
+@layout LoginLayout
+@inject AuthService AuthService
+@inject NavigationManager NavManager
+
+<div class="login-container">
+    <div class="login-card">
+        <h2 class="title">Bem-vindo de volta</h2>
+        <p class="subtitle">Acesse sua conta para continuar.</p>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" @bind="email" placeholder="seuemail@exemplo.com" class="input-field" />
+        </div>
+
+        <div class="form-group">
+            <label>Senha</label>
+            <input @bind="password" type="password" placeholder="••••••••" class="input-field" />
+        </div>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <p style="color: red; font-size: 0.8rem; margin-bottom: 10px;">@errorMessage</p>
+        }
+
+        <button class="btn-login" @onclick="RealizarLogin">
+            @if (isLoading)
+            {
+                <span>Carregando...</span>
+            }
+            else
+            {
+
+                <span>LOGIN</span>
+            }
+            </button>
+    </div>
+</div>
+
+@code {
+
+    private string email = "";
+    private string password = "";
+    private string errorMessage = "";
+    private bool isLoading = false;
+
+    private async Task RealizarLogin()
+    {
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        {
+            errorMessage = "Preencha todos os campos.";
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = "";
+
+        // Chamar o serviço real integrado com o endpoint
+        var sucesso = await AuthService.LoginAsync(email, password);
+
+        if (sucesso)
+        {
+            NavManager.NavigateTo("/dashboard"); // Redireciona para o painel
+        }
+        else
+        {
+            errorMessage = "Usuário ou senha inválidos.";
+        }
+
+        isLoading = false;
+    }
+}
+<style>
+    /* Fundo geral da página */
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Ocupa a altura total da janela */
+        background-color: #fbfbfb; /* Um cinza quase branco para o fundo */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* O cartão branco centralizado */
+    .login-card {
+        background-color: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Sombra suave */
+        width: 400px;
+        max-width: 400px; /* Largura máxima do cartão */
+        text-align: left;
+    }
+
+    .title {
+        color: #4a148c; 
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .subtitle {
+        color: #888;
+        font-size: 0.9rem;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    /* Estilo dos campos de texto (Input) */
+    .input-field {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        background-color: #eef2f8; 
+        border-radius: 6px;
+        outline: none;
+        font-size: 1rem;
+    }
+
+    .input-field:focus {
+        background-color: #e1e9f5; 
+    }
+
+    /* Botão Roxo */
+    .btn-login {
+        width: 100%;
+        padding: 12px;
+        background-color: #5e35b1;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background-color 0.2s;
+    }
+
+    .btn-login:hover {
+        background-color: #4527a0; 
+    }
+</style>

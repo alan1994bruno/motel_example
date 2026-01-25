@@ -1,0 +1,22 @@
+appsettings.json
+appsettings.Development.json
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userprefs
+
+## --- MAUI / Mobile Specifics ---
+*.keystore
+*.jks
+*.mobileprovision
+*.p12
+
+## --- Sistema Operacional ---
+Thumbs.db
+.DS_Store
+
+## --- Logs e Temporários ---
+*.log
+*.tmp

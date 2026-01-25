@@ -1,0 +1,243 @@
+﻿@page "/suites"
+@using Motel.Models
+@using Motel.Services
+@inject SuiteService SuiteService
+@inject NavigationManager NavManager
+
+<div class="header-actions">
+    <div>
+        <h2 class="page-title">GERENCIAR SUÍTES</h2>
+        <p class="page-subtitle">Controle de preços e disponibilidade</p>
+    </div>
+    <div class="actions-right">
+        <span class="badge-total">Total: <strong>@totalSuites</strong></span>
+        <button class="btn-new" @onclick='() => NavManager.NavigateTo("nova-suite")'>+ Nova Suíte</button>
+    </div>
+</div>
+
+<div class="table-container">
+    @if (isLoading)
+    {
+        <div style="padding: 60px; text-align: center; color: #666;">
+            <h3>⌛ Carregando dados...</h3>
+        </div>
+    }
+    else if (suites == null || !suites.Any())
+    {
+        <div style="padding: 40px; text-align: center;">Nenhuma suíte encontrada.</div>
+    }
+    else
+    {
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Nome da Suíte</th>
+                    <th>Preço/hora</th>
+                    <th>Unidades</th>
+                    <th style="text-align: right;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in suites)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>R$ @item.HourlyRate.ToString("F2")</td>
+                        <td><strong>@item.Units</strong></td>
+                        <td class="action-col">
+                            <button class="btn-edit">✎ Editar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<div class="pagination">
+    <span class="page-info">Página @(paginaAtual + 1) de @(totalPaginas == 0 ? 1 : totalPaginas)</span>
+    <div class="page-buttons">
+        <button disabled="@(paginaAtual == 0)" @onclick="PaginaAnterior">❮ Anterior</button>
+        <button disabled="@(paginaAtual >= totalPaginas - 1)" @onclick="ProximaPagina">Próxima ❯</button>
+    </div>
+</div>
+
+@code {
+    private List<RoomType> suites;
+    private int totalSuites = 0;
+    private int paginaAtual = 0;
+    private int totalPaginas = 1;
+    private bool isLoading = true;
+
+  
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await CarregarDados();
+            StateHasChanged();
+        }
+    }
+
+    private async Task CarregarDados()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await SuiteService.GetRoomsPageAsync(paginaAtual);
+
+            if (result != null)
+            {
+                suites = result.Content;
+                totalSuites = result.TotalElements;
+                totalPaginas = result.TotalPages;
+            }
+            else
+            {
+                suites = new List<RoomType>();
+            }
+        }
+        catch (Exception)
+        {
+            suites = new List<RoomType>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ProximaPagina()
+    {
+        if (paginaAtual < totalPaginas - 1)
+        {
+            paginaAtual++;
+            await CarregarDados();
+        }
+    }
+
+    private async Task PaginaAnterior()
+    {
+        if (paginaAtual > 0)
+        {
+            paginaAtual--;
+            await CarregarDados();
+        }
+    }
+}
+
+<style>
+    /* SEU CSS CONTINUA O MESMO DAQUI PARA BAIXO */
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        color: #2c3e50;
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .page-subtitle {
+        color: #999;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    .actions-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .badge-total {
+        background: white;
+        border: 1px solid #ddd;
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .btn-new {
+        background-color: #5e35b1;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .btn-new:hover {
+            background-color: #4527a0;
+        }
+
+    .table-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        border: 1px solid #eee;
+        overflow: hidden;
+    }
+
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .styled-table th {
+            background-color: #f8f9fa;
+            color: #5e35b1;
+            font-size: 0.85rem;
+            font-weight: bold;
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 2px solid #eee;
+        }
+
+        .styled-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+    .action-col {
+        text-align: right;
+    }
+
+    .btn-edit {
+        background: transparent;
+        border: 1px solid #5e35b1;
+        color: #5e35b1;
+        padding: 5px 15px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .page-buttons button {
+        background: white;
+        border: 1px solid #ddd;
+        padding: 8px 15px;
+        border-radius: 4px;
+        color: #555;
+        margin-left: 5px;
+    }
+</style>

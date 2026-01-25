@@ -1,0 +1,63 @@
+﻿@page "/dashboard"
+@inject NavigationManager NavManager
+
+<div class="header-actions">
+    <h2 class="page-title">Painel Administrativo</h2>
+    <p class="page-subtitle">Bem-vindo ao sistema de gestão.</p>
+</div>
+
+<div class="cards-grid">
+    <div class="card">
+        <span class="card-label">RESERVAS HOJE</span>
+        <strong class="card-value purple">12</strong>
+    </div>
+</div>
+
+<style>
+    /* AQUI SÓ FICA O CSS ESPECÍFICO DO DASHBOARD (Cards, titulos internos) */
+    .header-actions {
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        color: #2c3e50;
+        margin-bottom: 5px;
+        font-size: 1.4rem;
+    }
+
+    .page-subtitle {
+        color: #999;
+        font-size: 0.9rem;
+        margin-top: 0;
+    }
+
+    .cards-grid {
+        display: flex;
+        gap: 20px;
+    }
+
+    .card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #eee;
+        flex: 1;
+    }
+
+    .card-label {
+        display: block;
+        color: #777;
+        font-size: 0.7rem;
+        font-weight: bold;
+    }
+
+    .card-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+
+    .purple {
+        color: #5e35b1;
+    }
+    /* ... etc ... */
+</style>

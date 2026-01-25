@@ -1,0 +1,300 @@
+﻿@page "/nova-suite"
+@inject NavigationManager NavManager
+
+<div class="page-container">
+    <header class="navbar">
+        <div class="nav-left">
+            <h1 class="logo">Motel</h1>
+            <nav class="nav-links">
+                <a href="dashboard">INÍCIO</a>
+                <a href="#">RESERVAS ▾</a>
+                <a href="suites" class="active">SUÍTES</a>
+                <a href="#">CLIENTES</a>
+                <a href="#">CLIENTES PENALIZADOS</a>
+            </nav>
+        </div>
+        <button class="btn-logout" @onclick="Sair">LOGOUT ➜</button>
+    </header>
+
+    <main class="content-area">
+        <div class="form-card">
+            <div class="card-header">
+                <button class="btn-back" @onclick="Voltar">←</button>
+                <div>
+                    <h2 class="form-title">NOVA SUÍTE</h2>
+                    <p class="form-subtitle">Preencha todos os campos abaixo.</p>
+                </div>
+            </div>
+
+            <hr class="divider" />
+
+            <form>
+                <div class="row">
+                    <div class="col-grow">
+                        <label>Nome da Suíte</label>
+                        <input type="text" placeholder="Ex: Suíte Master" class="input-field" />
+                    </div>
+                    <div class="col-fixed">
+                        <label>Preço por Hora (R$)</label>
+                        <input type="text" placeholder="0,00" class="input-field" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-grow">
+                        <label>Unidades Disponíveis</label>
+                        <input type="number" placeholder="1" class="input-field" />
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <span>🖼 IMAGENS DA SUÍTE</span>
+                </div>
+                <hr class="divider-light" />
+
+                <div class="form-group">
+                    <label>URL da Imagem 1 <span class="required">*</span></label>
+                    <input type="text" placeholder="https://..." class="input-field" />
+                </div>
+                <div class="form-group">
+                    <label>URL da Imagem 2 <span class="required">*</span></label>
+                    <input type="text" placeholder="https://..." class="input-field" />
+                </div>
+                <div class="form-group">
+                    <label>URL da Imagem 3 <span class="required">*</span></label>
+                    <input type="text" placeholder="https://..." class="input-field" />
+                </div>
+
+                <button type="button" class="btn-save">💾 SALVAR SUÍTE</button>
+            </form>
+        </div>
+    </main>
+</div>
+
+@code {
+    private void Voltar()
+    {
+        NavManager.NavigateTo("suites");
+    }
+
+    private void Sair()
+    {
+        NavManager.NavigateTo("/");
+    }
+}
+
+<style>
+    /* Reset e Layout Base */
+    * {
+        box-sizing: border-box;
+    }
+
+    .content-area{
+        overflow: auto;
+    }
+
+    .page-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        width: 100%;
+        background-color: #fbfbfb;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Navbar (Padrão) */
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: white;
+        padding: 15px 40px;
+        width: 100%;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+   
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+    }
+
+    .logo {
+        color: #5e35b1;
+        font-style: italic;
+        font-weight: 900;
+        margin: 0;
+        font-size: 1.5rem;
+        border-bottom: 3px solid #5e35b1;
+        line-height: 1;
+    }
+
+    .nav-links a {
+        text-decoration: none;
+        color: #555;
+        font-size: 0.75rem;
+        font-weight: bold;
+        margin-right: 20px;
+    }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #5e35b1;
+        }
+
+    .btn-logout {
+        background-color: #5e35b1;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    /* Estilos do Card de Formulário */
+    .content-area {
+        display: flex;
+        justify-content: center;
+        padding-bottom: 40px;
+    }
+
+    .form-card {
+        background: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        width: 100%;
+        max-width: 600px; 
+        border-top: 5px solid #5e35b1; 
+    }
+
+    /* Header do Form */
+    .card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+
+    .btn-back {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #777;
+        cursor: pointer;
+        padding: 0;
+        margin-top: -5px;
+    }
+
+        .btn-back:hover {
+            color: #5e35b1;
+        }
+
+    .form-title {
+        color: #5e35b1;
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .form-subtitle {
+        color: #888;
+        font-size: 0.9rem;
+        margin: 5px 0 0 0;
+    }
+
+    .divider {
+        border: 0;
+        border-top: 1px solid #eee;
+        margin: 20px 0;
+    }
+
+    .divider-light {
+        border: 0;
+        border-top: 1px solid #f0f0f0;
+        margin: 10px 0 20px 0;
+    }
+
+    /* Campos e Layout */
+    .row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 15px;
+    }
+
+    .col-grow {
+        flex: 2;
+    }
+
+    .col-fixed {
+        flex: 1;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .required {
+        color: red;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        outline: none;
+        color: #555;
+    }
+
+        .input-field:focus {
+            border-color: #5e35b1;
+            background-color: #fbfbfc;
+        }
+
+    /* Seção Imagens */
+    .section-title {
+        margin-top: 30px;
+        font-size: 0.8rem;
+        color: #777;
+        font-weight: bold;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Botão Salvar */
+    .btn-save {
+        width: 100px; 
+        padding: 12px 20px;
+        background-color: #5e35b1;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+        .btn-save:hover {
+            background-color: #4527a0;
+        }
+</style>

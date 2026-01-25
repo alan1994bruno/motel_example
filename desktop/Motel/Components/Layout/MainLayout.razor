@@ -1,0 +1,220 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavManager
+
+<div class="page-container">
+    <header class="navbar">
+        <div class="nav-left">
+            <h1 class="logo">Motel</h1>
+            <nav class="nav-links">
+                <NavLink href="dashboard" Match="NavLinkMatch.All">INÍCIO</NavLink>
+
+                <div class="dropdown">
+                    <span class="nav-item-clickable @(menuAberto ? "active-dropdown" : "")" @onclick="ToggleMenu">
+                        RESERVAS ▾
+                    </span>
+
+                    @if (menuAberto)
+                    {
+                        <div class="dropdown-box">
+                            <div class="dropdown-item" @onclick='() => Navegar("reservas-ativas")'>
+                                <strong>Reservas Ativas</strong>
+                                <span>Gerenciamento em tempo real.</span>
+                            </div>
+                            <div class="dropdown-item" @onclick='() => Navegar("reservas-canceladas")'>
+                                <strong>Reservas Canceladas</strong>
+                                <span>Histórico de desistências.</span>
+                            </div>
+                            <div class="dropdown-item" @onclick='() => Navegar("reservas-concluidas")'>
+                                <strong>Reservas Concluídas</strong>
+                                <span>Histórico de finalizações.</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <NavLink href="suites">SUÍTES</NavLink>
+                <NavLink href="clientes">CLIENTES</NavLink>
+                <NavLink href="clientes-penalizados">CLIENTES PENALIZADOS</NavLink>
+            </nav>
+        </div>
+        <button class="btn-logout" @onclick="Sair">LOGOUT ➜</button>
+    </header>
+
+    <main class="content-area" @onclick="FecharMenuSeClicarFora">
+        @Body
+    </main>
+</div>
+
+@code {
+    // Variável para controlar se o menu aparece ou não
+    private bool menuAberto = false;
+
+    private void ToggleMenu()
+    {
+        menuAberto = !menuAberto; // Inverte (se tá aberto fecha, se tá fechado abre)
+    }
+
+    private void FecharMenuSeClicarFora()
+    {
+        // Se clicar no conteúdo principal, fecha o menu para não atrapalhar
+        if (menuAberto) menuAberto = false;
+    }
+
+    private void Navegar(string url)
+    {
+        menuAberto = false; // Fecha o menu ao clicar em uma opção
+        NavManager.NavigateTo(url); // Descomente quando criar essas páginas!
+    }
+
+    private void Sair()
+    {
+        NavManager.NavigateTo("/");
+    }
+}
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .content-area{
+        overflow-y:auto;
+    }
+
+    .page-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        width: 100%;
+        background-color: #fbfbfb;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: white;
+        padding: 15px 40px;
+        width: 100%;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        position: relative;
+        z-index: 100; /* Garante que fique acima de tudo */
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+    }
+
+    .logo {
+        color: #5e35b1;
+        font-style: italic;
+        font-weight: 900;
+        margin: 0;
+        font-size: 1.5rem;
+        border-bottom: 3px solid #5e35b1;
+        line-height: 1;
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+        /* Estilo dos Links Normais */
+        .nav-links a, .nav-item-clickable {
+            text-decoration: none;
+            color: #555;
+            font-size: 0.75rem;
+            font-weight: bold;
+            transition: color 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+            .nav-links a:hover, .nav-links a.active, .nav-item-clickable:hover, .active-dropdown {
+                color: #5e35b1;
+            }
+
+    /* --- ESTILOS DO DROPDOWN --- */
+    .dropdown {
+        position: relative; /* Necessário para o menu absoluto se alinhar a ele */
+    }
+
+    /* A caixinha flutuante */
+    .dropdown-box {
+        position: absolute;
+        top: 30px; /* Distância do topo */
+        left: -10px;
+        background-color: white;
+        width: 220px;
+        border-radius: 8px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15); /* Sombra suave igual print */
+        padding: 10px 0;
+        border: 1px solid #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        animation: fadeIn 0.2s ease-in-out;
+    }
+
+    /* Item dentro do menu */
+    .dropdown-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        border-left: 3px solid transparent; /* Borda invisível para hover */
+        transition: all 0.2s;
+    }
+
+        .dropdown-item:hover {
+            background-color: #f9f7fd; /* Fundo roxinho bem claro */
+            border-left-color: #5e35b1; /* Borda roxa na esquerda */
+        }
+
+        .dropdown-item strong {
+            display: block;
+            color: #5e35b1; /* Título roxo */
+            font-size: 0.85rem;
+            margin-bottom: 3px;
+        }
+
+        .dropdown-item span {
+            display: block;
+            color: #888; /* Subtítulo cinza */
+            font-size: 0.75rem;
+            font-weight: normal;
+        }
+
+    .btn-logout {
+        background-color: #5e35b1;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .content-area {
+        padding: 40px;
+        width: 100%;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    /* Animaçãozinha suave ao abrir */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

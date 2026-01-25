@@ -1,0 +1,307 @@
+﻿@page "/clientes"
+@using Motel.Models
+@using Motel.Services
+@inject ClientService ClientService
+@inject NavigationManager NavManager
+
+<div class="header-actions">
+    <div>
+        <h2 class="page-title">GERENCIAR CLIENTES</h2>
+        <p class="page-subtitle">Base de usuários cadastrados</p>
+    </div>
+    <div class="actions-right">
+        <span class="badge-total">Total: <strong>@totalClients</strong></span>
+    </div>
+</div>
+
+<div class="table-container">
+    @if (isLoading)
+    {
+        <div style="padding: 60px; text-align: center; color: #666;">
+            <h3>⌛ Carregando clientes...</h3>
+        </div>
+    }
+    else if (clients == null || !clients.Any())
+    {
+        <div style="padding: 40px; text-align: center;">Nenhum cliente encontrado.</div>
+    }
+    else
+    {
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Usuário / Email</th>
+                    <th>CPF</th>
+                    <th>Telefone</th>
+                    <th>Status</th>
+                    <th>Penalidade</th>
+                    <th style="text-align: right;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in clients)
+                {
+                    <tr>
+                        <td>
+                            <strong>@item.Username</strong><br />
+                            <span style="font-size: 0.8rem; color: #888;">@item.Email</span>
+                        </td>
+
+                        <td>@(item.Profile?.Cpf ?? "---")</td>
+                        <td>@(item.Profile?.Phone ?? "---")</td>
+
+                        <td>
+                            @if (item.Enabled)
+                            {
+                                <span class="badge-active">Ativo</span>
+                            }
+                            else
+                            {
+                                <span class="badge-inactive">Bloqueado</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (item.Penalty != null)
+                            {
+                                <span class="badge-penalty">Dívida: R$ @item.Penalty.Price.ToString("F2")</span>
+                            }
+                            else
+                            {
+                                <span style="color: #ccc;">Nada constada</span>
+                            }
+                        </td>
+
+                        <td class="action-col">
+                            <button class="btn-view" @onclick='() => NavManager.NavigateTo($"editar-cliente/{item.PublicId}")'>👁 Ver</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<div class="pagination">
+    <span class="page-info">Página @(paginaAtual + 1) de @(totalPaginas == 0 ? 1 : totalPaginas)</span>
+    <div class="page-buttons">
+        <button disabled="@(paginaAtual == 0)" @onclick="PaginaAnterior">❮ Anterior</button>
+        <button disabled="@(paginaAtual >= totalPaginas - 1)" @onclick="ProximaPagina">Próxima ❯</button>
+    </div>
+</div>
+
+@code {
+    private List<ClientUser> clients;
+    private int totalClients = 0;
+    private int paginaAtual = 0;
+    private int totalPaginas = 1;
+    private bool isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await CarregarDados();
+            StateHasChanged();
+        }
+    }
+
+    private async Task CarregarDados()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await ClientService.GetClientsPageAsync(paginaAtual);
+
+            if (result != null)
+            {
+                clients = result.Content;
+                totalClients = result.TotalElements;
+                totalPaginas = result.TotalPages;
+            }
+            else
+            {
+                clients = new List<ClientUser>();
+            }
+        }
+        catch (Exception)
+        {
+            clients = new List<ClientUser>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ProximaPagina()
+    {
+        if (paginaAtual < totalPaginas - 1)
+        {
+            paginaAtual++;
+            await CarregarDados();
+        }
+    }
+
+    private async Task PaginaAnterior()
+    {
+        if (paginaAtual > 0)
+        {
+            paginaAtual--;
+            await CarregarDados();
+        }
+    }
+}
+
+<style>
+
+    .page-title {
+        color: #2c3e50;
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .page-subtitle {
+        color: #999;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .actions-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .badge-total {
+        background: white;
+        border: 1px solid #ddd;
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    /* Tabela */
+    .table-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        border: 1px solid #eee;
+        overflow: hidden;
+    }
+
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .styled-table th {
+            background-color: #f8f9fa;
+            color: #5e35b1;
+            font-size: 0.85rem;
+            font-weight: bold;
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 2px solid #eee;
+        }
+
+        .styled-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+    .action-col {
+        text-align: right;
+    }
+
+    /* Badges Específicos de Clientes */
+    .badge-active {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: bold;
+    }
+
+    .badge-inactive {
+        background-color: #ffebee;
+        color: #c62828;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: bold;
+    }
+
+    .badge-penalty {
+        background-color: #fff3e0;
+        color: #e65100;
+        border: 1px solid #ffcc80;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .btn-view {
+        background: transparent;
+        border: 1px solid #555;
+        color: #555;
+        padding: 5px 15px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+        .btn-view:hover {
+            background-color: #f0f0f0;
+        }
+
+    /* Paginação */
+    .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .page-info {
+        color: #888;
+        font-size: 0.9rem;
+    }
+
+    .page-buttons button {
+        background: white;
+        border: 1px solid #ddd;
+        padding: 8px 15px;
+        border-radius: 4px;
+        color: #555;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+        .page-buttons button:hover:not([disabled]) {
+            background-color: #eee;
+        }
+
+        .page-buttons button[disabled] {
+            color: #ccc;
+            cursor: default;
+        }
+</style>
