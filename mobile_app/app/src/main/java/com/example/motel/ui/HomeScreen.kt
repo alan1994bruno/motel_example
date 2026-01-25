@@ -6,81 +6,63 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.motel.model.Suite
 import coil.compose.AsyncImage
+import com.example.motel.model.Suite
 import com.example.motel.viewmodel.HomeViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+// Mudei o nome para deixar claro que é só o CONTEÚDO (sem barra de topo)
 @Composable
-fun HomeScreen(
-    onLogout: () -> Unit,
-    viewModel: HomeViewModel = viewModel() // Injeta o novo ViewModel
+fun HomeScreenContentOnly(
+    viewModel: HomeViewModel,
+    onSuiteClick: (String) -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Motel", fontWeight = FontWeight.Bold, color = Color.White) },
-                actions = { IconButton(onClick = onLogout) { Icon(Icons.Default.Close, "Sair", tint = Color.White) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BrandPurple)
-            )
-        },
-        containerColor = BackgroundWhite
-    ) { innerPadding ->
+    Box(modifier = Modifier.fillMaxSize().background(BackgroundWhite)) {
 
-        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-
-            if (viewModel.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = BrandPurple)
-            } else if (viewModel.errorMessage != null) {
-                // Botão de tentar novamente se der erro
-                Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Erro ao carregar", color = Color.Red)
-                    Button(onClick = { viewModel.fetchRooms() }) { Text("Tentar Novamente") }
+        if (viewModel.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = BrandPurple)
+        } else if (viewModel.errorMessage != null) {
+            Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Erro ao carregar", color = Color.Red)
+                Button(onClick = { viewModel.fetchRooms() }) { Text("Tentar Novamente") }
+            }
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    Text("SUÍTES DISPONÍVEIS", color = BrandPurple, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
                 }
-            } else {
-                // Lista de Suítes Reais
-                LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    item {
-                        Text("SUÍTES DISPONÍVEIS", color = BrandPurple, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-                    }
 
-                    // Usa a lista do ViewModel (viewModel.suites)
-                    items(viewModel.suites) { suite ->
-                        SuiteCard(suite)
-                    }
+                items(viewModel.suites) { suite ->
+                    SuiteCard(suite, onSuiteClick)
+                }
 
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        LocationSection() // Mantenha sua função LocationSection igual estava
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    LocationSection()
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
     }
 }
 
+// Mantenha SuiteCard e LocationSection iguais...
 @Composable
-fun SuiteCard(suite: Suite) {
+fun SuiteCard(suite: Suite, onClick: (String) -> Unit) {
+    /* ... Seu código do Card aqui ... */
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -88,28 +70,21 @@ fun SuiteCard(suite: Suite) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column {
-            // ÁREA DA IMAGEM
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp) // Aumentei um pouco para ficar bonito
-                    .background(Color.LightGray),
+                modifier = Modifier.fillMaxWidth().height(200.dp).background(Color.LightGray),
                 contentAlignment = Alignment.Center
             ) {
                 if (suite.imageUrl != null) {
-                    // Carrega a imagem da URL
                     AsyncImage(
                         model = suite.imageUrl,
                         contentDescription = suite.name,
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop // Corta a imagem para preencher tudo
+                        contentScale = ContentScale.Crop
                     )
                 } else {
-                    // Placeholder se não tiver imagem na API
                     Icon(Icons.Default.Home, null, tint = Color.White, modifier = Modifier.size(64.dp))
                 }
             }
-
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text(suite.name, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
@@ -119,7 +94,7 @@ fun SuiteCard(suite: Suite) {
                 Text(suite.description, fontSize = 12.sp, color = Color.Gray, lineHeight = 16.sp)
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = { },
+                    onClick = { onClick(suite.id) },
                     colors = ButtonDefaults.buttonColors(containerColor = BrandRed),
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp)
@@ -131,34 +106,64 @@ fun SuiteCard(suite: Suite) {
 
 @Composable
 fun LocationSection() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-            Icon(Icons.Default.Place, null, tint = BrandPurple, modifier = Modifier.size(28.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("LOCALIZAÇÃO", color = BrandPurple, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text("Fácil acesso e discrição total. Venha nos visitar.", color = Color.Gray, fontSize = 14.sp, textAlign = TextAlign.Center)
-        Spacer(modifier = Modifier.height(16.dp))
-        Box(
-            modifier = Modifier.fillMaxWidth().height(250.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFFDDDDDD)),
-            contentAlignment = Alignment.Center
+    Card(
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp), // Remove sombra se quiser flat
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent), // Fundo transparente para integrar
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Visualização do Mapa", color = Color.Gray.copy(alpha = 0.5f))
-            Card(
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.wrapContentSize().padding(32.dp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // CORREÇÃO AQUI: Use apenas 'Icon' (do Material 3)
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = null,
+                    tint = BrandPurple,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "LOCALIZAÇÃO",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = BrandPurple
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Fácil acesso e discrição total. Venha nos visitar.",
+                fontSize = 14.sp,
+                color = Color.Gray,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Card cinza simulando o mapa/logo
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .background(Color(0xFFE0E0E0), shape = RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(vertical = 24.dp, horizontal = 40.dp)) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Motel", color = BrandPurple, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, fontStyle = FontStyle.Italic)
-                        Box(modifier = Modifier.width(40.dp).height(3.dp).background(BrandPurple))
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("UNIDADE MATRIZ", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    Text("Feira de Santana - BA", color = Color.Gray, fontSize = 12.sp)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Motel",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = BrandPurple,
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "UNIDADE MATRIZ\nFeira de Santana - BA",
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Gray
+                    )
                 }
             }
         }

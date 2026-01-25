@@ -29,6 +29,7 @@ class LoginViewModel (application: Application) : AndroidViewModel(application) 
                 println("Sucesso! Token: ${response.token}")
                 Log.e("token",response.token)
                 tokenManager.saveToken(response.token)
+                RetrofitClient.authToken = response.token
                 isLoading = false
                 onSuccess()
             } catch (e: Exception) {
