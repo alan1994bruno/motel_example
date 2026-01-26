@@ -80,8 +80,6 @@ export type ReservationRequest = {
   checkoutTime: string; // ISO 8601 datetime
 };
 
-// --- 4. Estrutura de Paginação (Genérica) ---
-
 export interface SortInfo {
   empty: boolean;
   sorted: boolean;
