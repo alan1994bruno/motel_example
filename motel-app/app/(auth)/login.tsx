@@ -1,3 +1,4 @@
+import { loginUser } from "@/services/auth";
 import { useUserStore } from "@/store/user-store";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link, useRouter } from "expo-router";
@@ -110,7 +111,7 @@ const SubmitButton = styled.TouchableOpacity`
   shadow-color: ${({ theme }) => theme.colors.primary};
   shadow-offset: 0px 4px;
   shadow-opacity: 0.3;
-  shadow-radius: 4px;
+  shadow-radius: 4;
 `;
 
 const ButtonText = styled.Text`
@@ -175,14 +176,9 @@ export default function LoginScreen() {
     Keyboard.dismiss();
 
     try {
-      console.log("Tentando logar:", data);
+      const { token, email } = await loginUser(data);
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      const fakeToken = "ey...token_falso...";
-
-      // Salva no Zustand (que salva no SecureStore)
-      setToken(fakeToken, data.email);
+      setToken(token, email);
     } catch (error) {
       Alert.alert("Erro de Acesso", "Email ou senha incorretos.");
     } finally {
@@ -203,7 +199,6 @@ export default function LoginScreen() {
               <Subtitle>Acesse sua conta para continuar</Subtitle>
             </HeaderContainer>
 
-            {/* --- CAMPO EMAIL --- */}
             <InputWrapper>
               <Label>Email</Label>
               <Controller
@@ -235,7 +230,6 @@ export default function LoginScreen() {
               {errors.email && <ErrorText>{errors.email.message}</ErrorText>}
             </InputWrapper>
 
-            {/* --- CAMPO SENHA --- */}
             <InputWrapper>
               <Label>Senha</Label>
               <Controller
@@ -282,7 +276,6 @@ export default function LoginScreen() {
               <ForgotPasswordText>Esqueci minha senha</ForgotPasswordText>
             </ForgotPasswordButton>
 
-            {/* --- BOTÃO DE LOGIN --- */}
             <SubmitButton
               onPress={handleSubmit(onSubmit)}
               disabled={loading}

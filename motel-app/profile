@@ -1,0 +1,11 @@
+const { clear } = useUserStore();
+const router = useRouter();
+
+const handleLogout = () => {
+  clear(); // Limpa Zustand e SecureStore
+  router.replace("/(auth)/login");
+};
+
+useEffect(() => {
+  handleLogout();
+}, []);

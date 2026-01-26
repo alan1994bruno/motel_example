@@ -1,8 +1,8 @@
 "use server";
 import { api } from "@/lib/api";
-import { ReservationSummary } from "@/types/reresvation.type";
+import { Payment } from "@/types/penality.type";
 
-export async function getPenalty(): Promise<ReservationSummary> {
+export async function getPenalty(): Promise<Payment> {
   const res = await api.get(`/penalties/my-penalty`);
 
   return res.data;

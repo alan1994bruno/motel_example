@@ -1,25 +1,15 @@
 import { useRouter } from "expo-router";
-import React from "react";
-import { FlatList, StatusBar } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StatusBar,
+} from "react-native";
 import styled from "styled-components/native";
-
-// Imports da Raiz
 import { Header } from "@/components/header";
-
-const SUITES = [
-  {
-    id: "1",
-    name: "Suíte Master",
-    price: 120,
-    image: "https://github.com/alan1994bruno/images/raw/master/Erotica/1.jpg",
-  },
-  {
-    id: "2",
-    name: "Suíte Erótica",
-    price: 150,
-    image: "https://github.com/alan1994bruno/images/raw/master/Erotica/2.jpg",
-  },
-];
+import { RoomType } from "@/@types/rooms";
+import { getRooms } from "@/services/rooms";
 
 const Container = styled.View`
   flex: 1;
@@ -43,24 +33,25 @@ const Subtitle = styled.Text`
   margin-bottom: 20px;
 `;
 
-// Card
+const LoadingContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+
+// Card Styles
 const Card = styled.TouchableOpacity`
   background-color: ${({ theme }) => theme.colors.surface};
   border-radius: 16px;
   margin-bottom: 20px;
   overflow: hidden;
   border: 1px solid ${({ theme }) => theme.colors.border};
-  /* Sombras sutis */
   elevation: 3;
-  shadow-color: #000;
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.1;
-  shadow-radius: 4px;
 `;
 
 const SuiteImage = styled.Image`
   width: 100%;
-  height: 220px; /* Imagens maiores ficam ótimas no mobile */
+  height: 220px;
   background-color: #e5e7eb;
 `;
 
@@ -99,35 +90,102 @@ const PriceValue = styled.Text`
 export default function HomeScreen() {
   const router = useRouter();
 
+  // 1. ESTADOS PARA DADOS REAIS
+  const [suites, setSuites] = useState<RoomType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // 2. FUNÇÃO QUE BUSCA OS DADOS
+  const fetchSuites = async () => {
+    try {
+      const data = await getRooms();
+      setSuites(data);
+    } catch (error) {
+      console.error("Erro ao buscar quartos:", error);
+      // Aqui você poderia mostrar um Alert ou Toast
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  // 3. EFEITO INICIAL (Carrega ao abrir a tela)
+  useEffect(() => {
+    fetchSuites();
+  }, []);
+
+  // 4. FUNÇÃO DE PULL-TO-REFRESH
+  const onRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    fetchSuites();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Container>
+        <Header />
+        <LoadingContainer>
+          <ActivityIndicator size="large" color="#4c1d95" />
+        </LoadingContainer>
+      </Container>
+    );
+  }
+
   return (
     <Container>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar />
       <Header />
 
       <FlatList
-        data={SUITES}
-        keyExtractor={(item) => item.id}
+        data={suites}
+        keyExtractor={(item) => String(item.id)} // Garante que a key seja string
         contentContainerStyle={{ paddingBottom: 20 }}
+        // Adiciona o recurso de puxar para atualizar
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            colors={["#4c1d95"]}
+          />
+        }
         ListHeaderComponent={
           <ContentPadding>
             <Title>Nossas Suítes</Title>
             <Subtitle>Escolha o conforto ideal para você</Subtitle>
           </ContentPadding>
         }
+        ListEmptyComponent={
+          <ContentPadding>
+            <Subtitle style={{ textAlign: "center", marginTop: 20 }}>
+              Nenhuma suíte encontrada no momento.
+            </Subtitle>
+          </ContentPadding>
+        }
         renderItem={({ item }) => (
-          <ContentPadding style={{ paddingTop: 0, paddingBottom: 0 }}>
+          <ContentPadding
+            key={item.publicId}
+            style={{ paddingTop: 0, paddingBottom: 0 }}
+          >
             <Card
-              onPress={() => router.push(`/suite/${item.id}`)}
+              onPress={() => router.push(`/suite/${item.publicId}`)}
               activeOpacity={0.9}
             >
-              <SuiteImage source={{ uri: item.image }} resizeMode="cover" />
+              {/* Ajuste o campo da imagem conforme vem da sua API (ex: item.photo, item.image, item.url) */}
+              <SuiteImage
+                source={{
+                  uri:
+                    item.images[0].url ||
+                    "https://via.placeholder.com/400x200?text=Sem+Imagem",
+                }}
+                resizeMode="cover"
+              />
               <CardBody>
                 <SuiteHeader>
                   <SuiteName>{item.name}</SuiteName>
                   <PriceContainer>
                     <PriceLabel>A partir de</PriceLabel>
                     <PriceValue>
-                      R$ {item.price.toFixed(2).replace(".", ",")}
+                      R$ {item.hourlyRate?.toFixed(2).replace(".", ",")}
                     </PriceValue>
                   </PriceContainer>
                 </SuiteHeader>
