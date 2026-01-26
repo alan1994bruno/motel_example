@@ -1,98 +1,141 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useRouter } from "expo-router";
+import React from "react";
+import { FlatList, StatusBar } from "react-native";
+import styled from "styled-components/native";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+// Imports da Raiz
+import { Header } from "@/components/header";
+
+const SUITES = [
+  {
+    id: "1",
+    name: "Suíte Master",
+    price: 120,
+    image: "https://github.com/alan1994bruno/images/raw/master/Erotica/1.jpg",
+  },
+  {
+    id: "2",
+    name: "Suíte Erótica",
+    price: 150,
+    image: "https://github.com/alan1994bruno/images/raw/master/Erotica/2.jpg",
+  },
+];
+
+const Container = styled.View`
+  flex: 1;
+  background-color: ${({ theme }) => theme.colors.background};
+`;
+
+const ContentPadding = styled.View`
+  padding: 16px;
+`;
+
+const Title = styled.Text`
+  font-size: 22px;
+  font-weight: bold;
+  color: ${({ theme }) => theme.colors.text};
+  margin-bottom: 4px;
+`;
+
+const Subtitle = styled.Text`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.textLight};
+  margin-bottom: 20px;
+`;
+
+// Card
+const Card = styled.TouchableOpacity`
+  background-color: ${({ theme }) => theme.colors.surface};
+  border-radius: 16px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  /* Sombras sutis */
+  elevation: 3;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+`;
+
+const SuiteImage = styled.Image`
+  width: 100%;
+  height: 220px; /* Imagens maiores ficam ótimas no mobile */
+  background-color: #e5e7eb;
+`;
+
+const CardBody = styled.View`
+  padding: 16px;
+`;
+
+const SuiteHeader = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+`;
+
+const SuiteName = styled.Text`
+  font-size: 18px;
+  font-weight: bold;
+  color: ${({ theme }) => theme.colors.primary};
+  flex: 1;
+`;
+
+const PriceContainer = styled.View`
+  align-items: flex-end;
+`;
+
+const PriceLabel = styled.Text`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.textLight};
+`;
+
+const PriceValue = styled.Text`
+  font-size: 20px;
+  font-weight: 800;
+  color: ${({ theme }) => theme.colors.primary};
+`;
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  return (
+    <Container>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <Header />
+
+      <FlatList
+        data={SUITES}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        ListHeaderComponent={
+          <ContentPadding>
+            <Title>Nossas Suítes</Title>
+            <Subtitle>Escolha o conforto ideal para você</Subtitle>
+          </ContentPadding>
+        }
+        renderItem={({ item }) => (
+          <ContentPadding style={{ paddingTop: 0, paddingBottom: 0 }}>
+            <Card
+              onPress={() => router.push(`/suite/${item.id}`)}
+              activeOpacity={0.9}
+            >
+              <SuiteImage source={{ uri: item.image }} resizeMode="cover" />
+              <CardBody>
+                <SuiteHeader>
+                  <SuiteName>{item.name}</SuiteName>
+                  <PriceContainer>
+                    <PriceLabel>A partir de</PriceLabel>
+                    <PriceValue>
+                      R$ {item.price.toFixed(2).replace(".", ",")}
+                    </PriceValue>
+                  </PriceContainer>
+                </SuiteHeader>
+              </CardBody>
+            </Card>
+          </ContentPadding>
+        )}
+      />
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});

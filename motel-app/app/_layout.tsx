@@ -1,24 +1,61 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { useUserStore } from "@/store/user-store";
+import theme from "@/theme";
+import {
+  Stack,
+  useRootNavigationState,
+  useRouter,
+  useSegments,
+} from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
+import { ThemeProvider } from "styled-components/native";
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const { isAuthenticated, hasHydrated } = useUserStore();
+  const segments = useSegments();
+  const router = useRouter();
+
+  const rootNavigationState = useRootNavigationState();
+
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    if (hasHydrated) {
+      setIsReady(true);
+    }
+  }, [hasHydrated]);
+
+  useEffect(() => {
+    if (!rootNavigationState?.key) return;
+
+    if (!isReady) return;
+
+    const inAuthGroup = segments[0] === "(auth)";
+
+    SplashScreen.hideAsync();
+
+    if (isAuthenticated && inAuthGroup) {
+      router.replace("/(tabs)");
+    } else if (!isAuthenticated && segments[0] !== "(auth)") {
+      router.replace("/(auth)/login");
+    }
+  }, [isAuthenticated, segments, isReady, rootNavigationState?.key]);
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+    <ThemeProvider theme={theme}>
+      <StatusBar style="dark" />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="suite/[id]" options={{ presentation: "modal" }} />
       </Stack>
-      <StatusBar style="auto" />
     </ThemeProvider>
   );
 }
