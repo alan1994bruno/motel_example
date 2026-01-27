@@ -34,3 +34,4 @@ build/
 .vscode/
 !**/src/resources/application.properties
 application-secret.properties
+application.properties
