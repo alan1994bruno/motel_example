@@ -41,3 +41,11 @@ export interface UpdateUserClientData {
   cep: string;
   password?: string; // <--- (Opcional)
 }
+
+export interface CreateUserData {
+  email: string;
+  phone: string;
+  cpf: string;
+  cep: string;
+  password: string;
+}

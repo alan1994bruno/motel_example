@@ -11,6 +11,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -141,14 +142,17 @@ const LinkText = styled.Text`
   margin-left: 4px;
 `;
 
-const ForgotPasswordButton = styled.TouchableOpacity`
-  align-self: flex-end;
+const ForgotPasswordContainer = styled.View`
+  width: 100%;
+  align-items: flex-end; /* Alinha à direita */
   margin-bottom: 24px;
+  margin-top: 8px;
 `;
 
 const ForgotPasswordText = styled.Text`
+  color: #4c1d95; /* Roxo */
+  font-weight: 600;
   font-size: 14px;
-  color: ${({ theme }) => theme.colors.textLight};
 `;
 
 export default function LoginScreen() {
@@ -270,11 +274,13 @@ export default function LoginScreen() {
               )}
             </InputWrapper>
 
-            <ForgotPasswordButton
-              onPress={() => router.push("/recover-password")}
-            >
-              <ForgotPasswordText>Esqueci minha senha</ForgotPasswordText>
-            </ForgotPasswordButton>
+            <ForgotPasswordContainer>
+              <Link href="/(auth)/recover" asChild>
+                <TouchableOpacity>
+                  <ForgotPasswordText>Esqueceu a senha?</ForgotPasswordText>
+                </TouchableOpacity>
+              </Link>
+            </ForgotPasswordContainer>
 
             <SubmitButton
               onPress={handleSubmit(onSubmit)}
@@ -289,7 +295,6 @@ export default function LoginScreen() {
             </SubmitButton>
 
             <Footer>
-              <FooterText>Não tem uma conta?</FooterText>
               <Link href="/register" asChild>
                 <TouchableWithoutFeedback>
                   <LinkText>Cadastre-se</LinkText>

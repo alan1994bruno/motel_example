@@ -1,9 +1,9 @@
 "use server";
 import { api } from "@/lib/api";
 import { PageResponse } from "@/types/page.type";
-import { User, UpdateUserClientData } from "@/types/users.type";
+import { User, UpdateUserClientData, CreateUserData } from "@/types/users.type";
 
-export async function createUser(data: any) {
+export async function createUser(data: CreateUserData) {
   await api.post<any>("/users", data);
 }
 
