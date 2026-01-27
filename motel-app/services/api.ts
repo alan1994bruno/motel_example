@@ -1,8 +1,14 @@
 import axios from "axios";
 import { useUserStore } from "@/store/user-store";
 
+const baseURL = process.env.EXPO_PUBLIC_API_URL;
+
+if (!baseURL) {
+  console.error("ERRO CRÍTICO: A URL da API não foi definida no .env");
+}
+
 export const api = axios.create({
-  baseURL: "http://localhost:8080", // Troque pelo seu IP local ou URL de produção
+  baseURL: baseURL, // Troque pelo seu IP local ou URL de produção
   timeout: 10000,
 });
 
