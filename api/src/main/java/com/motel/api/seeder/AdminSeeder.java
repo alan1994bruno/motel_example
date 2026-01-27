@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @Profile("!test")
@@ -16,6 +17,15 @@ public class AdminSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+
+    // --- VARIÁVEIS INJETADAS ---
+    // O Spring vai buscar isso no application.properties ou Variáveis de Ambiente
+    @Value("${api.security.admin.email}")
+    private String adminEmail;
+
+    @Value("${api.security.admin.password}")
+    private String adminPassword;
+
 
     public AdminSeeder(UserRepository userRepository,
                        RoleRepository roleRepository,
@@ -30,7 +40,7 @@ public class AdminSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         // 1. Verifica se o admin já existe (Idempotência)
         // Se já existir, para o código aqui. Não queremos duplicar.
-        if (userRepository.findByEmail("admin@admin.com").isPresent()) {
+        if (userRepository.findByEmail(adminEmail).isPresent()) {
             System.out.println(">>> SEED: Admin já existe. Pulando criação.");
             return;
         }
@@ -41,14 +51,14 @@ public class AdminSeeder implements CommandLineRunner {
 
         // 3. Cria o Usuário
         User admin = new User();
-        admin.setEmail("admin@admin.com");
-        admin.setPassword(passwordEncoder.encode("admin123")); // <--- O Pulo do Gato: Criptografia
+        admin.setEmail(adminEmail);
+        admin.setPassword(passwordEncoder.encode(adminPassword)); // <--- O Pulo do Gato: Criptografia
         admin.setRole(adminRole);
 
         // O PublicId é gerado automaticamente na Entidade, então não precisa setar
 
         userRepository.save(admin);
 
-        System.out.println(">>> SEED: Usuário Admin criado com sucesso! (admin@admin.com / admin123)");
+
     }
 }
